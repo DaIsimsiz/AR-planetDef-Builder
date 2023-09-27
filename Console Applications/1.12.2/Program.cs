@@ -1,5 +1,7 @@
-﻿using System.ComponentModel;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
+using static Modules.MessageSend.Temp;
+using static Modules.NewCBody.Temp;
+using static Modules.DefaultSol.Temp;
 
 namespace ARplanetDefBuilder
 {
@@ -25,136 +27,12 @@ namespace ARplanetDefBuilder
                     "Or, if you are done, you can enter \"done\" and have the xml file exported to a file and sent to the console!"
                 });
                 input = Console.ReadLine();
-                if(input == "star") galaxy.Add(NewStar(binary: false));
+                if(input == "star") galaxy.Add(NewStar());
                 else if(input == "done") break;
             }
 
             Console.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
             Console.WriteLine(galaxy);
-        }
-
-        /// <summary>
-        /// Cleans the console and sends the new messages.
-        /// </summary>
-        static void SendMessages(params string[] messages)
-        {
-            Console.Clear();
-            foreach(string message in messages) Console.WriteLine(message);
-        }
-
-        /// <summary>
-        /// Generates the Sol, Earth, and Luna, referencing from my automatically generated planetDefs.xml file.
-        /// </summary>
-        static XElement Default()
-    
-        {
-            return
-            new XElement("star",
-            new XAttribute("blackHole", "false"),
-            new XAttribute("name", "Sol"),
-            new XAttribute("numGasGiants", "0"),
-            new XAttribute("numPlanets", "0"),
-            new XAttribute("size", "1.0"),
-            new XAttribute("temp", "100"),
-            new XAttribute("x", "0"),
-            new XAttribute("y", "0"),
-            
-            new XElement("planet",
-            new XAttribute("DIMID", "0"),
-            new XAttribute("dimMapping", ""),
-            new XAttribute("name", "Earth"),
-            new XElement("isKnown", "true"),
-            new XElement("fogColor", "1.0,1.0,1.0"),
-            new XElement("skyColor", "1.0,1.0,1.0"),
-            new XElement("gravitationalMultiplier", "100"),
-            new XElement("orbitalDistance", "100"),
-            new XElement("orbitalTheta", "0"),
-            new XElement("orbitalPhi", "0"),
-            new XElement("retrograde", "false"),
-            new XElement("avgTemperature", "287"),
-            new XElement("rotationalPeriod", "24000"),
-            new XElement("atmosphereDensity", "100"),
-            new XElement("generateCraters", "false"),
-            new XElement("generateCaves", "false"),
-            new XElement("generateVolcanos", "false"),
-            new XElement("generateStructures", "false"),
-            new XElement("generateGeodes", "false"),
-
-            new XElement("planet",
-            new XAttribute("DIMID", "3"),
-            new XAttribute("name", "Luna"),
-            new XElement("isKnown", "false"),
-            new XElement("fogColor", "1.0,1.0,1.0"),
-            new XElement("skyColor", "1.0,1.0,1.0"),
-            new XElement("gravitationalMultiplier", "16"),
-            new XElement("orbitalDistance", "150"),
-            new XElement("orbitalTheta", "0"),
-            new XElement("orbitalPhi", "0"),
-            new XElement("retrograde", "false"),
-            new XElement("avgTemperature", "20"),
-            new XElement("rotationalPeriod", "128000"),
-            new XElement("atmosphereDensity", "0"),
-            new XElement("generateCraters", "true"),
-            new XElement("generateCaves", "false"),
-            new XElement("generateVolcanos", "false"),
-            new XElement("generateStructures", "false"),
-            new XElement("generateGeodes", "false"),
-            new XElement("biomeIds", "advancedrocketry:moon;30,advancedrocketry:moondark;30")
-            )));
-        }
-
-        /// <summary>
-        /// Initiates the creation of a new star.
-        /// </summary>
-        /// <param name="binary">If true, removes some options that are incompatible with binary stars.</param>
-        /// <returns></returns>
-        static XElement NewStar(bool binary)
-        {
-            string? input;
-            XElement star = new XElement("star");
-            SendMessages("Set a name for your new star, leave empty for random!");
-            input = Console.ReadLine();
-            star.Add(new XAttribute("name", input == null ? PickRandomName(true) : input));
-
-            SendMessages(new string[] {
-                "How hot is your star, multiply the heat you want by 58, floor it and enter your value if you want a realistic input!",
-                "For reference, Sol's temperature is 100!",
-                "Entering an invalid value or nothing will pick a random value between 40-850."
-            });
-            input = Console.ReadLine();
-            star.Add(new XAttribute("temp", int.TryParse(input, out _) ? int.Parse(input) : new Random().Next(40, 850)));
-
-            star.Add(new XAttribute("x", new Random().Next(-500, 500)));
-            star.Add(new XAttribute("y", new Random().Next(-500, 500)));
-            
-            SendMessages(new string[] {
-                "If you'd like to add another star, enter \"star\"",
-                "If you'd like to add a planet, or an asteroid, enter \"planet\"",
-                "If that's all, just enter \"exit\""
-            });
-            while(true) {
-                switch(Console.ReadLine()) {
-                    case "star":
-                        //do stuff
-                        break;
-                    case "planet":
-                        //do stuff
-                        break;
-                    case "exit":
-                        return star;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Picks a random star name when true, otherwise a planet name.
-        /// </summary>
-        static string PickRandomName(bool isStar)
-        {
-            List<string> names;
-            if(isStar) names = File.ReadAllLines("starNames.txt").ToList();
-            else names = File.ReadAllLines("planetNames.txt").ToList();
-            return names[new Random().Next(names.Count)];
         }
     }
 }
@@ -168,17 +46,6 @@ y - y
 numPlanets - number of terrestrial planets randomly generated
 numGasGiants - same with numPlanets but for gas giants
 blackHole - true or false
-
-
-Binar Star Specification Example 
-        <galaxy>
-            <star name="Sol" temp="100" x="0" y="0" numPlanets="1" numGasGiants="0" blackHole="false">
-                <star name="Sol-2" temp="200" separation="10.0" />
-                <planet name="Jole">
-                    ...
-                </planet>
-            </star>
-        </galaxy>
 
 
 Planet Attributes List
@@ -213,6 +80,7 @@ retrograde - ???
 
 
 Planet Specifications List
+name - name
 DIMID - dimension id (usually higher than 3 for mostly vanilla gameplays, but higher is safer)
 dimMapping - add this with an empty string if the dimension already exists and you just wanna turn it into a planet
 customIcon - string containing either a default icon or a custom icon
