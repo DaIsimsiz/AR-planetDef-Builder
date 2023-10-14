@@ -1,8 +1,8 @@
 using System.Xml.Linq;
 
-namespace Modules.DefaultSol
+namespace Modules
 {
-    class Temp
+    class DefaultSol
     {
         /// <summary>
         /// Generates the Sol, Earth, and Luna, referencing from my automatically generated planetDefs.xml file.

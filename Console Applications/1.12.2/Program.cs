@@ -1,7 +1,8 @@
 ﻿using System.Xml.Linq;
-using static Modules.MessageSend.Temp;
-using static Modules.NewCBody.Temp;
-using static Modules.DefaultSol.Temp;
+using static Modules.MessageSend;
+using static Modules.NewCBody;
+using static Modules.DefaultSol;
+using static Modules.PlanetDef;
 
 namespace ARplanetDefBuilder
 {
@@ -9,30 +10,27 @@ namespace ARplanetDefBuilder
     {
         static void Main()
         {
-            XElement galaxy = new XElement("galaxy");
-
-            SendMessages(new string[] {
-                "Let's create the Solar system first!",
-                "We will create the Sol, Earth, and Luna for you, but you can modify their properties if you wish so!"});
-
-            galaxy.Add(Default());
-
-            Task.Delay(5000);
+            Galaxy galaxy = new Galaxy();
+            galaxy.AddSystem(Default());
 
             string? input;
             while(true) {
                 SendMessages(new string[] {
-                    "Does your galaxy need more stars?",
-                    "You can enter \"star\" if so!",
-                    "Or, if you are done, you can enter \"done\" and have the xml file exported to a file and sent to the console!"
+                    "Solar System has been automatically generated.",
+                    "star   => Create a new star system.",
+                    "export => Export the file"
                 });
                 input = Console.ReadLine();
-                if(input == "star") galaxy.Add(NewStar());
-                else if(input == "done") break;
+                if(input == "star") galaxy.AddSystem(NewStar());
+                else if(input == "export") {
+                    SendMessages("Are you sure? (y/n)");
+                    while(true) {
+                        input = Console.ReadLine();
+                        if(input == "y") {galaxy.Export();return;}
+                        else if(input == "n") break;
+                    }
+                }
             }
-
-            Console.WriteLine("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>");
-            Console.WriteLine(galaxy);
         }
     }
 }
@@ -84,4 +82,35 @@ name - name
 DIMID - dimension id (usually higher than 3 for mostly vanilla gameplays, but higher is safer)
 dimMapping - add this with an empty string if the dimension already exists and you just wanna turn it into a planet
 customIcon - string containing either a default icon or a custom icon
+*/
+
+
+
+/*
+#####################################((((((((((((###################((((##((((((
+#######################################(((((((((##########################((((((
+########################################(((((((#############################(###
+#########################################(((((##################################
+########################################(((((###################################
+############################/, /(#########(((###################################
+###############((////***,,,,,*.    ,(#######(###################################
+#############.*################((/ ,  .(##((####################################
+############( ###################/ /(,    ./####################################
+############./###################(.  /###*                   *##################
+######%####/ ##%################*  *####(. . (#*. .*##(((#######################
+#######%###.(############%####, /(./###( (### /######,  *(######################
+#####%%%##/ ##%%##%%%##%#%###/ ##(./####.(###(.##########/ *####################
+##########.*##%##%%%%%%%%%####( (#./####,.###( ############# *##################
+,,         ., /(#########%#%%### (./####( #### ##############(.,################
+(((((((((((((///*,,,.       ., /( .,##### /###,(################.,##############
+((((((((((((((((((((((((((((((((//,,.           *((###############.,############
+((((((((((((((((((((((((((((((((((((((((((((((((((//*,.        ., /(. *#########
+((((((((((((((((((((((((((((##(((((((((((((((#(((((((((((((((((((///*,,.        
+(((((((((((((((((((((((((((((#((((((((((((((((((((((((((((((((((((((((((((((((((
+#######((((((((((((((((((((((#((((((((((((((((((((/(((((w(((((((((((((((((((((((
+
+
+
+
+
 */

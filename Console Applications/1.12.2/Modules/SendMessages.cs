@@ -1,6 +1,6 @@
-namespace Modules.MessageSend
+namespace Modules
 {
-    class Temp
+    class MessageSend
     {
         /// <summary>
         /// Cleans the console and sends the new messages.
