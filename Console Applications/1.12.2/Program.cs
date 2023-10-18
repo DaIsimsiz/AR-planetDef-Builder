@@ -1,30 +1,35 @@
-﻿using System.Xml.Linq;
-using static Modules.MessageSend;
+﻿using static Modules.MessageSend;
 using static Modules.NewCBody;
-using static Modules.DefaultSol;
 using static Modules.PlanetDef;
+using static Modules.Interface;
 
 namespace ARplanetDefBuilder
 {
     class Program
     {
+        static Galaxy galaxy = new Galaxy();
         static void Main()
         {
-            Galaxy galaxy = new Galaxy();
-            galaxy.AddSystem(Default());
-
             string? input;
+
             while(true) {
+                LoadObject(galaxy.GetProperty("./galaxy/star"));
                 SendMessages(new string[] {
-                    "Solar System has been automatically generated.",
+                    "",
+                    "----------------------------------------",
                     "star   => Create a new star system.",
                     "export => Export the file"
                 });
+
                 input = Console.ReadLine();
-                if(input == "star") galaxy.AddSystem(NewStar());
-                else if(input == "export") {
+
+                if(input == "star") galaxy.SetProperty("./galaxy" ,NewStar());
+
+                else if(input == "export")
+                {
                     SendMessages("Are you sure? (y/n)");
-                    while(true) {
+                    while(true)
+                    {
                         input = Console.ReadLine();
                         if(input == "y") {galaxy.Export();return;}
                         else if(input == "n") break;

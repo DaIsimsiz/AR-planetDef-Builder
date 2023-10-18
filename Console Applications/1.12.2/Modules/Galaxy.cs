@@ -1,5 +1,7 @@
+using static Modules.DefaultSol;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Modules
 {
@@ -7,73 +9,52 @@ namespace Modules
     {
         public class Galaxy
         {
-            public static XDocument Document = new(new XElement("galaxy"))
+            #pragma warning disable //We *do* want to get null references.
+            XDocument Document = new(new XElement("galaxy", Default()))
             {
                 Declaration = new XDeclaration("1.0", "UTF-8", "no")
             };
 
-            
-            public void AddSystem(XElement star)
+            /// <summary>
+            /// Returns the attribute at the specified path.
+            /// </summary>
+            public XAttribute GetAttribute(string path, string attributeName)
             {
-                #pragma warning disable
-                //Adding to the galaxy (it's a star, thus a new star system) 
-                Document.Element("galaxy").Add(star);
+                return GetProperty(path).Attribute(attributeName);
+            }
+            /// <summary>
+            /// Returns the property at the specified path.
+            /// </summary>
+            public XElement GetProperty(string path)
+            {
+                return Document.XPathSelectElement(path);
+            }
+            /// <summary>
+            /// Changes/Removes/Adds the attribute at the specified path.
+            /// </summary>
+            public void SetAttribute(string path, string attributeName, string value)
+            {
+                Document.XPathSelectElement(path).Attribute(attributeName).Value = value;
+            }
+            /// <summary>
+            /// Changes/Removes the property at the specified path.
+            /// </summary>
+            public void SetProperty(string path, string value)
+            {
+                if(value != null) Document.XPathSelectElement(path).Value = value;
+                Document.XPathSelectElement(path).Remove();
+            }
+            /// <summary>
+            /// Changes/Removes/Adds the property at the specified path.
+            /// </summary>
+            public void SetProperty(string path, XElement property)
+            {
+                Document.XPathSelectElement(path).Add(property);
             }
 
-            public void AddToBody(string bodyName, XElement body, string moonName = null)
-            {
-                //Adding to a star (it's either a binary star or a planet, doesn't matter)
-                if(moonName == null) Document.Element("galaxy").Element(bodyName).Add(body);
-                //Adding to a planet (it's a moon)
-                else Document.Element("galaxy").Element(bodyName).Element(moonName).Add(body);
-            }
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
-            public XElement GetSystem(string systemName) {
-                return Document.Element("galaxy").Element(systemName);
-            }
-            public XElement GetBody(string systemName, string bodyName, string moonName = null) {
-                //Return something that's in the star system (excluding the main star), planet or binary star
-                if(moonName == null) return Document.Element("galaxy").Element(systemName).Element(bodyName);
-                //Return a moon of a planet
-                else return Document.Element("galaxy").Element(systemName).Element(bodyName).Element(moonName);
-            }
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
-            public void SetSystem(string systemName, XElement modifiedBody) {
-                Document.Element("galaxy").Element(systemName).Remove();
-                Document.Element("galaxy").Add(modifiedBody);
-            }
-            public void SetBody(string systemName, string bodyName, XElement modifiedBody, string moonName = null) {
-                if(moonName == null) {
-                    Document.Element("galaxy").Element(systemName).Element(bodyName).Remove();
-                    Document.Element("galaxy").Element(systemName).Add(modifiedBody);
-                }else{
-                    Document.Element("galaxy").Element(systemName).Element(bodyName).Element(moonName).Remove();
-                    Document.Element("galaxy").Element(systemName).Element(bodyName).Add(modifiedBody);
-                }
-            }
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
-            public void RemoveSystem(string systemName) {
-                Document.Element("galaxy").Element(systemName).Remove();
-            }
-            public void RemoveBody(string systemName, string bodyName, string moonName = null) {
-                if(moonName == null) {
-                    Document.Element("galaxy").Element(systemName).Element(bodyName).Remove();
-                }else{
-                    Document.Element("galaxy").Element(systemName).Element(bodyName).Element(moonName).Remove();
-                }
-            }
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
-            //--------------------------------------------------------------------------
+
             public void Export(string path = null) {
                 Console.WriteLine(Document);
-
                 Document.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\planetDefsEXPORT.xml");
             }
         }

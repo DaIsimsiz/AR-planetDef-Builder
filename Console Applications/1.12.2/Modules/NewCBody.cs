@@ -97,22 +97,17 @@ namespace Modules
         /// <param name="binary">If true, removes some options that are incompatible with binary stars.</param>
         /// <returns></returns>
         public static XElement NewStar(bool binary = false)
-        { //Rewrite while you still understand what it's about
+        {
             string? input;
+
+            List<string> starV = new List<string>();
+            string[] starRequired = {"name", "temp", "size"};
             int numPlanets = 0;
             int numGasGiants = 0;
-            XElement star = new XElement("star");
-            SendMessages("Set a name for your new star, leave empty for random!");
-            input = Console.ReadLine();
-            star.Add(new XAttribute("name", input == null ? PickRandomName(true) : input));
+            //X and Y coordinates, along with these random planets will be handled separately
 
-            SendMessages(new string[] {
-                "How hot is your star, multiply the heat you want by 58, floor it and enter your value if you want a realistic input!",
-                "For reference, Sol's temperature is 100!",
-                "Entering an invalid value or nothing will pick a random value between 40-850."
-            });
-            input = Console.ReadLine();
-            star.Add(new XAttribute("temp", int.TryParse(input, out _) ? int.Parse(input) : new Random().Next(40, 850)));
+            XElement star = new XElement("star");
+            InputAttributeValues(ref starRequired, ref starV, ref StarAttributes, ref star, true);
 
             if(!binary) {
                 star.Add(new XAttribute("x", new Random().Next(-500, 500)));
@@ -124,25 +119,26 @@ namespace Modules
             }
 
             if(binary) return star;
-
-            while(true) {
-                SendMessages(new string[] {
-                    "If you'd like to add another star, enter \"star\"",
-                    "If you'd like to add a planet, or an asteroid, enter \"planet\"",
-                    "If that's all, just enter \"exit\""
-                });
-                switch(Console.ReadLine()) {
-                    case "star":
-                        star.Add(NewStar(true));
-                        break;
-                    case "planet":
-                        XElement planet = NewPlanet(ref numPlanets);
-                        if(planet != null) star.Add(planet);
-                        break;
-                    case "exit":
-                        star.Add(new XAttribute("numPlanets", numPlanets.ToString()));
-                        star.Add(new XAttribute("numGasGiants", numGasGiants.ToString()));
-                        return star;
+            else{
+                while(true) {
+                    SendMessages(new string[] {
+                        "If you'd like to add another star, enter \"star\"",
+                        "If you'd like to add a planet, or an asteroid, enter \"planet\"",
+                        "If that's all, just enter \"exit\""
+                    });
+                    switch(Console.ReadLine()) {
+                        case "star":
+                            star.Add(NewStar(true));
+                            break;
+                        case "planet":
+                            XElement planet = NewPlanet(ref numPlanets);
+                            if(planet != null) star.Add(planet);
+                            break;
+                        case "exit":
+                            star.Add(new XAttribute("numPlanets", numPlanets.ToString()));
+                            star.Add(new XAttribute("numGasGiants", numGasGiants.ToString()));
+                            return star;
+                    }
                 }
             }
         }
@@ -164,30 +160,12 @@ namespace Modules
             string[] requiredTerrestrial = {"isKnown", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes", "biomeIds"};
             string[] requiredGaseous = {"isKnown", "GasGiant", "gas", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes"};
 
-            foreach(string attributeName in requiredAttributes) {
-                SendMessages("Enter a value for \"{0}\".\nDescription: {1}", attributeName, PlanetAttributes[attributeName]);
-                AttributesV.Add(Console.ReadLine());
-            }
-            for(int i = 0; i < AttributesV.Count; i++) {
-                planet.Add(new XAttribute(requiredAttributes[i], AttributesV[i]));
-            }
+            InputAttributeValues(ref requiredAttributes, ref AttributesV, ref PlanetAttributes, ref planet);
 
             if(gaseous) {
-                foreach(string propertyName in requiredGaseous) {
-                    SendMessages("Enter a value for \"{0}\".\nDescription: {1}", propertyName, GaseousPlanetSpecifications[propertyName]);
-                    GaseousV.Add(Console.ReadLine());
-                }
-                for(int i = 0; i < GaseousV.Count; i++) {
-                    planet.Add(new XElement(requiredGaseous[i], GaseousV[i]));
-                }
+                InputPropertyValues(ref requiredGaseous, ref GaseousV, ref GaseousPlanetSpecifications, ref planet);
             }else{
-                foreach(string propertyName in requiredTerrestrial) {
-                    SendMessages("Enter a value for \"{0}\".\nDescription: {1}", propertyName, TerrestrialPlanetSpecifications[propertyName]);
-                    TerrestrialV.Add(Console.ReadLine());
-                }
-                for(int i = 0; i < TerrestrialV.Count; i++) {
-                    planet.Add(new XElement(requiredTerrestrial[i], TerrestrialV[i]));
-                }
+                InputPropertyValues(ref requiredTerrestrial, ref TerrestrialV, ref TerrestrialPlanetSpecifications, ref planet);
             }
 
             return planet;
@@ -196,13 +174,53 @@ namespace Modules
         /// <summary>
         /// Picks a random star name when true, otherwise a planet name.
         /// </summary>
-        static string PickRandomName(bool isStar)
+        static string PickRandomName(bool isStar = false)
         { 
             //Integrate into code
             List<string> names;
             if(isStar) names = File.ReadAllLines("starNames.txt").ToList();
             else names = File.ReadAllLines("planetNames.txt").ToList();
-            return names[new Random().Next(names.Count)];
+            return names[new Random().Next(names.Count)]; //Fix so you dont read the whole file
+        }
+
+        static void InputPropertyValues(ref string[] required, ref List<string> valuesL, ref Dictionary<string, string> Dictionary, ref XElement body) {
+            foreach(string propertyName in required) {
+                SendMessages($"Enter a value for \"{propertyName}\".\nDescription: {Dictionary[propertyName]}");
+                valuesL.Add(Console.ReadLine());
+            }
+            InputValidation(ref valuesL, ref required);
+            for(int i = 0; i < valuesL.Count; i++) {
+                body.Add(new XElement(required[i], valuesL[i]));
+            }
+        }
+        static void InputAttributeValues(ref string[] required, ref List<string> valuesL, ref Dictionary<string, string> Dictionary, ref XElement body, bool isStar = false) {
+            string input = String.Empty;
+            foreach(string attributeName in required) {
+                SendMessages($"Enter a value for \"{attributeName}\".\nDescription: {Dictionary[attributeName]}");
+                input = Console.ReadLine();
+                if(attributeName == "name" && input == "") input = PickRandomName(); 
+                valuesL.Add(input);
+            }
+            InputValidation(ref valuesL, ref required);
+            for(int i = 0; i < valuesL.Count; i++) {
+                body.Add(new XAttribute(required[i], valuesL[i]));
+            }
+        }
+        //ref ref ref ref ref everywhere
+        static void InputValidation(ref List<string> values, ref string[] names) {
+            foreach(string value in values) {
+                switch(value) {
+                    case "a":
+                        //
+                        break;
+                    case "b":
+                        //
+                        break;
+                    default:
+                        //
+                        break;
+                } //oooh my god
+            }
         }
     }
 } 
