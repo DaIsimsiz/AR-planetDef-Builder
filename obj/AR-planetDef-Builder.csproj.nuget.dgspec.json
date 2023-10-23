@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\AR-planetDef-Builder\\Console Applications\\1.12.2\\AR-planetDef-Builder.csproj": {}
+    "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\1.12.2-Console\\AR-planetDef-Builder.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\AR-planetDef-Builder\\Console Applications\\1.12.2\\AR-planetDef-Builder.csproj": {
+    "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\1.12.2-Console\\AR-planetDef-Builder.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\AR-planetDef-Builder\\Console Applications\\1.12.2\\AR-planetDef-Builder.csproj",
+        "projectUniqueName": "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\1.12.2-Console\\AR-planetDef-Builder.csproj",
         "projectName": "AR-planetDef-Builder",
-        "projectPath": "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\AR-planetDef-Builder\\Console Applications\\1.12.2\\AR-planetDef-Builder.csproj",
+        "projectPath": "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\1.12.2-Console\\AR-planetDef-Builder.csproj",
         "packagesPath": "C:\\Users\\Muhammet Emin Özgür\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\AR-planetDef-Builder\\Console Applications\\1.12.2\\obj\\",
+        "outputPath": "C:\\Users\\Muhammet Emin Özgür\\Desktop\\Repos\\1.12.2-Console\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

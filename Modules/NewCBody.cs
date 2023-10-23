@@ -98,12 +98,10 @@ namespace Modules
         /// <returns></returns>
         public static XElement NewStar(bool binary = false)
         {
-            string? input;
+            //string? input;
 
             List<string> starV = new List<string>();
             string[] starRequired = {"name", "temp", "size"};
-            int numPlanets = 0;
-            int numGasGiants = 0;
             //X and Y coordinates, along with these random planets will be handled separately
 
             XElement star = new XElement("star");
@@ -118,40 +116,47 @@ namespace Modules
                 star.Add(new XAttribute("separation", 10.0f));
             }
 
-            if(binary) return star;
-            else{
-                while(true) {
-                    SendMessages(new string[] {
-                        "If you'd like to add another star, enter \"star\"",
-                        "If you'd like to add a planet, or an asteroid, enter \"planet\"",
-                        "If that's all, just enter \"exit\""
-                    });
-                    switch(Console.ReadLine()) {
-                        case "star":
-                            star.Add(NewStar(true));
-                            break;
-                        case "planet":
-                            XElement planet = NewPlanet(ref numPlanets);
-                            if(planet != null) star.Add(planet);
-                            break;
-                        case "exit":
-                            star.Add(new XAttribute("numPlanets", numPlanets.ToString()));
-                            star.Add(new XAttribute("numGasGiants", numGasGiants.ToString()));
-                            return star;
-                    }
-                }
-            }
+            return star;
         }
         /// <summary>
         /// Creates a new planet.
         /// </summary>
-        static XElement NewPlanet(ref int numPlanets, bool moon = false, bool gaseous = false) {
+        public static XElement NewPlanet(ref int numPlanets, ref int numGasGiants) {
             #pragma warning disable
             string? input;
+            bool gaseous = false;
             XElement planet = new XElement("planet");
 
+            SendMessages("Is the planet gaseous?\n y/n");
+            if(Console.ReadLine() == "y") {gaseous = true;}
             SendMessages("Would you like the planet to be randomly generated?\n y/n");
-            if(Console.ReadLine() == "y") {numPlanets++;return null;}
+            if(Console.ReadLine() == "y") {if(gaseous) numGasGiants++;else numPlanets++;return null;}
+
+            List<string> AttributesV = new List<string>();
+            List<string> TerrestrialV = new List<string>();
+            List<string> GaseousV = new List<string>();
+            string[] requiredAttributes = {"name", "DIMID"};
+            string[] requiredTerrestrial = {"isKnown", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes", "biomeIds"};
+            string[] requiredGaseous = {"isKnown", "GasGiant", "gas", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes"};
+
+            InputAttributeValues(ref requiredAttributes, ref AttributesV, ref PlanetAttributes, ref planet);
+
+            if(gaseous) {
+                InputPropertyValues(ref requiredGaseous, ref GaseousV, ref GaseousPlanetSpecifications, ref planet);
+            }else{
+                InputPropertyValues(ref requiredTerrestrial, ref TerrestrialV, ref TerrestrialPlanetSpecifications, ref planet);
+            }
+
+            return planet;
+        }
+        public static XElement NewPlanet(string path) {
+            #pragma warning disable
+            string? input;
+            bool gaseous = false;
+            XElement planet = new XElement("planet");
+
+            SendMessages("Is the planet gaseous?\n y/n");
+            if(Console.ReadLine() == "y") {gaseous = true;}
 
             List<string> AttributesV = new List<string>();
             List<string> TerrestrialV = new List<string>();
