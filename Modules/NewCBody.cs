@@ -1,5 +1,5 @@
 using System.Xml.Linq;
-using static Modules.MessageSend;
+using static Modules.Msg;
 
 namespace Modules
 {
@@ -112,7 +112,7 @@ namespace Modules
                 star.Add(new XAttribute("y", new Random().Next(-500, 500)));
             }
             else{
-                SendMessages("How far should this star be from the main star?");
+                SendMessages(true, "How far should this star be from the main star?");
                 star.Add(new XAttribute("separation", 10.0f));
             }
 
@@ -127,9 +127,9 @@ namespace Modules
             bool gaseous = false;
             XElement planet = new XElement("planet");
 
-            SendMessages("Is the planet gaseous?\n y/n");
+            SendMessages(true, "Is the planet gaseous?\n y/n");
             if(Console.ReadLine() == "y") {gaseous = true;}
-            SendMessages("Would you like the planet to be randomly generated?\n y/n");
+            SendMessages(true, "Would you like the planet to be randomly generated?\n y/n");
             if(Console.ReadLine() == "y") {if(gaseous) numGasGiants++;else numPlanets++;return null;}
 
             List<string> AttributesV = new List<string>();
@@ -155,8 +155,12 @@ namespace Modules
             bool gaseous = false;
             XElement planet = new XElement("planet");
 
-            SendMessages("Is the planet gaseous?\n y/n");
-            if(Console.ReadLine() == "y") {gaseous = true;}
+            while(true) {
+                SendMessages(true, "Is the planet gaseous?\n y/n");
+                input = Console.ReadLine();
+                if(input == "y") {gaseous = true;break;}
+                else if(input == "n") {gaseous = false;break;}
+            }
 
             List<string> AttributesV = new List<string>();
             List<string> TerrestrialV = new List<string>();
@@ -190,7 +194,7 @@ namespace Modules
 
         static void InputPropertyValues(ref string[] required, ref List<string> valuesL, ref Dictionary<string, string> Dictionary, ref XElement body) {
             foreach(string propertyName in required) {
-                SendMessages($"Enter a value for \"{propertyName}\".\nDescription: {Dictionary[propertyName]}");
+                SendMessages(true, $"Enter a value for \"{propertyName}\".\nDescription: {Dictionary[propertyName]}");
                 valuesL.Add(Console.ReadLine());
             }
             InputValidation(ref valuesL, ref required);
@@ -201,7 +205,7 @@ namespace Modules
         static void InputAttributeValues(ref string[] required, ref List<string> valuesL, ref Dictionary<string, string> Dictionary, ref XElement body, bool isStar = false) {
             string input = String.Empty;
             foreach(string attributeName in required) {
-                SendMessages($"Enter a value for \"{attributeName}\".\nDescription: {Dictionary[attributeName]}");
+                SendMessages(true, $"Enter a value for \"{attributeName}\".\nDescription: {Dictionary[attributeName]}");
                 input = Console.ReadLine();
                 if(attributeName == "name" && input == "") input = PickRandomName(); 
                 valuesL.Add(input);
@@ -225,6 +229,21 @@ namespace Modules
                         //
                         break;
                 } //oooh my god
+            }
+        }
+
+        public static string ReturnValid(string name, string value) { {
+            switch(name) {
+                case "a":
+                    //
+                    return "lol";
+                case "b":
+                    //
+                    return "lol";
+                default:
+                    //
+                    return "lol";
+                } //return a valid value please
             }
         }
     }

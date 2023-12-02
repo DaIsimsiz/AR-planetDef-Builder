@@ -1,5 +1,4 @@
 using System.Xml.Linq;
-using static Modules.MessageSend;
 
 namespace Modules
 {
@@ -10,16 +9,13 @@ namespace Modules
         /// </summary>
         public static void LoadObject(XElement body)
         {
+            Console.Clear();
             //This is coded in a way that will work for any amount of attributes, even if there arent more than 10.
 
             int idL = (body.Attributes().Count() > body.Elements().Count()) ? (body.Attributes().Count() - 1).ToString().Length : (body.Elements().Count() - 1).ToString().Length;
             int nameL = 0;
-            foreach(XAttribute x in body.Attributes()) {
-                nameL = x.Name.ToString().Length > nameL ? x.Name.ToString().Length : nameL;
-            }
-            foreach(XElement x in body.Elements()) {
-                nameL = x.Name.ToString().Length > nameL ? x.Name.ToString().Length : nameL;
-            }
+            foreach(XAttribute x in body.Attributes()) {nameL = x.Name.ToString().Length > nameL ? x.Name.ToString().Length : nameL;}
+            foreach(XElement x in body.Elements()) {nameL = x.Name.ToString().Length > nameL ? x.Name.ToString().Length : nameL;}
             int attributeC = body.Attributes().Count();
             int propertyC = body.Elements().Count();
             
@@ -27,15 +23,11 @@ namespace Modules
             Console.Write($"Body name: ");
 
             switch(body.Name.ToString()) {
-                case "galaxy":
-                    Console.WriteLine("Galaxy");
-                    break;
-                case "star":
-                    Console.WriteLine(body.Attribute("name").Value);
-                    break;
-                case "planet":
-                    Console.WriteLine(body.Attribute("name").Value);
-                    break;
+                #pragma warning disable
+                case "galaxy": Console.WriteLine("Galaxy");break;
+                case "star"  : Console.WriteLine(body.Attribute("name").Value);break;
+                case "planet": Console.WriteLine(body.Attribute("name").Value);break;
+                #pragma warning restore
             }
 
             Console.WriteLine("\nAttributes:");
@@ -55,16 +47,11 @@ namespace Modules
                 Console.Write($" | {body.Elements().ElementAt(i).Name} ");
                 for(int x = body.Elements().ElementAt(i).Name.ToString().Length; x < nameL; x++) {Console.Write(" ");}
                 switch(body.Elements().ElementAt(i).Name.ToString()) {
-                    //#pragma warning disable
-                    case "planet":
-                        Console.Write($"> {body.Elements().ElementAt(i).Attribute("name").Value}");
-                        break;
-                    case "star":
-                        Console.Write($"> {body.Elements().ElementAt(i).Attribute("name").Value}");
-                        break;
-                    default:
-                        Console.Write($"> {body.Elements().ElementAt(i).Value}");
-                        break;
+                    #pragma warning disable
+                    case "planet": Console.Write($"> {body.Elements().ElementAt(i).Attribute("name").Value}");break;
+                    case "star"  : Console.Write($"> {body.Elements().ElementAt(i).Attribute("name").Value}");break;
+                    default      : Console.Write($"> {body.Elements().ElementAt(i).Value}");break;
+                    #pragma warning restore
                 }
                 Console.WriteLine();
             }

@@ -1,158 +1,102 @@
-﻿using static Modules.MessageSend;
-using static Modules.NewCBody;
-using static Modules.PlanetDef;
+﻿using static Modules.PlanetDef;
 using static Modules.Interface;
+using static Modules.Msg;
 
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace ARplanetDefBuilder
 {
     class Program
     {
-        static Galaxy galaxy = new Galaxy();
+        static readonly Galaxy galaxy = new();
+        static readonly Modules.PlanetDef.Path path = new();
+
         static void Main()
         {
             string? input;
-            string path = "./galaxy";
-            int depth;
-
             while(true) {
-                depth = Regex.Count(path, @$"\/+");
-                Console.WriteLine(path);
-                LoadObject(galaxy.GetProperty(path));
-                Console.WriteLine("----------------------------------------");
-                switch(depth) {
-                    case 1:
-                        Console.WriteLine("star          => Create a new star system");
-                        Console.WriteLine("<property ID> => Navigate to the specified property");
-                        break;
-                    case 2:
-                        Console.WriteLine("nAttr                   => Add a new attribute\n");
-                        Console.WriteLine("star                    => Create a new binary star");
-                        Console.WriteLine("planet                  => Create a new planet");
-                        Console.WriteLine("<attribute/property ID> => Navigate to the specified attribute/property");
-                        break;
-                    case 3: //TAKE BINARY STARS INTO ACCOUNT!!!
-                        Console.WriteLine("nAttr                   => Add a new attribute");
-                        Console.WriteLine("nProp                   => Add a new property\n");
-                        Console.WriteLine("planet                  => Create a new moon");
-                        Console.WriteLine("<attribute/property ID> => Navigate to the specified attribute/property");
-                        break;
-                    case 4:
-                        Console.WriteLine("nAttr                   => Add a new attribute\n");
-                        Console.WriteLine("nProp                   => Add a new property\n");
-                        Console.WriteLine("<attribute/property ID> => Navigate to the specified attribute/property");
-                        break;
-                }
-                Console.WriteLine("\nexport                  => Export the file");
-
+                LoadObject(galaxy.GetProperty(path.FullPath));
+                InputPrompt();
+                #pragma warning disable
                 input = Console.ReadLine().ToLower();
+                #pragma warning restore
+                AnalyzeInput(input);
+            }
+        }
 
-                if(input == "star" && depth < 3) galaxy.SetProperty(path, NewStar(binary: depth == 2));                     //new star
-                else if(input == "planet" && depth < 4 && depth > 1) galaxy.SetProperty(path, NewPlanet(path));             //new planet
-                else if(input == "nattr" && depth > 1) galaxy.SetProperty(path ,NewStar(binary: depth == 2));               //new attribute
-                else if(input == "nprop" && depth > 2) galaxy.SetProperty(path ,NewStar(binary: depth == 2));               //new property
-                else if(input.StartsWith('p') && int.TryParse(input.Substring(1), out _)) {
-                    if(int.Parse(input.Substring(1)) + 1 > galaxy.GetProperty(path).Elements().Count() || int.Parse(input.Substring(1)) < 0) continue;
-                    else path += "/" + galaxy.GetProperty(path).Elements().ElementAt(int.Parse(input.Substring(1))).Name.ToString() + "[" + (input.Substring(1) + 1) + "]";
-                }
-                else if(input.StartsWith('a') && int.TryParse(input.Substring(1), out _)) {
-                    //stuff
-                }
-                else if(new Random().Next(2) == 1) {continue;}
-
-                else if(input == "export")
-                {
-                    SendMessages("Are you sure? (y/n)");
-                    while(true)
-                    {
-                        input = Console.ReadLine();
-                        if(input == "y") {galaxy.Export();return;}
-                        else if(input == "n") break;
+        static void InputPrompt() {
+            switch(path.Depth()) { //a planet or moon property should enter here
+                case 1:
+                    SendMessages(false,
+                    "new       => Add a new element/attribute (star)");
+                    break;
+                case 2:
+                    SendMessages(false,
+                    "new       => Add a new element/attribute (star/planet/attribute)");
+                    break;
+                case 3:
+                    if(path.Last() == "star") SendMessages(false, "new       => Add a new element/attribute (attribute)"); //Binary star
+                    else SendMessages(false, "new       => Add a new element/attribute (attribute/property/moon)"); //Planet
+                    break;
+                case 4:
+                    SendMessages(false, "new       => Add a new element/attribute (attribute/property)"); //Moon
+                    break;
+            }
+            SendMessages(false,
+                    "edit <ID> => Modify the specified property/attribute",
+                    "del <ID>  => Delete the specified property/attribute");
+        }
+        static void AnalyzeInput(string input){
+            int index;
+            if(input.StartsWith("edit ")) {
+                if(input[5] == 'p') {
+                    if(int.TryParse(input[6..], out _)) {
+                        Console.WriteLine(galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[6..]))); //Continue here//
                     }
                 }
+            }
+            if(input.StartsWith("del ")) {}
+            switch(path.Depth()) { //a planet or moon property should enter here
+                case 1:
+                    SendMessages(false,
+                    "new       => Add a new element/attribute (star)");
+                    break;
+                case 2:
+                    SendMessages(false,
+                    "new       => Add a new element/attribute (star/planet/attribute)");
+                    break;
+                case 3:
+                    if(path.Last() == "star") SendMessages(false, "new       => Add a new element/attribute (attribute)"); //Binary star
+                    else SendMessages(false, "new       => Add a new element/attribute (attribute/property/moon)"); //Planet
+                    break;
+                case 4:
+                    SendMessages(false, "new       => Add a new element/attribute (attribute/property)"); //Moon
+                    break;
             }
         }
     }
 }
 
 /*
-Star Specifications List
-name - name
-temp - 100 is default for sol
-x - x
-y - y
-numPlanets - number of terrestrial planets randomly generated
-numGasGiants - same with numPlanets but for gas giants
-blackHole - true or false
-
-
-Planet Attributes List
-isKnown - if true, planet has to be researched in warp controller first
-hasRings - if true, planet has rings
-GasGiant - if true, the planet cant be landed on
-gas -  specifices which gases can be mined from the planet, not limited to AR gases
-genType - EXPERIMENTAL 0 = overworld, 1 = nether, 2 = asteroid
-fogColor - 3 floats or 1 hex code determining fog color
-skyColor - same as fogColor
-atmosphereDensity - atmospheric pressure on planet, default is 100
-hasOxygen - overrides atmosphere oxygen presence
-gravitationalMultiplier - planet gravity, 400-0, 110+ prevents jumping on full blocks so recommended is 110-10
-orbitalDistance - distance from star
-orbitalTheta - specifies starting angular displacement, e.g. setting 2 planets 1 with 0 and one with 180 makes them orbit at the opposite sides of the star
-orbitalPhi - clockwise displacement of sun's rising and settign direction
-OreGen - UNDOCUMENTED
-rotationalPeriod - length of day night cycle in ticks (1s = 20t)
-fillerBlock - replaces stone(?) and grass (filler blocks)
-oceanBlock - ocean block
-seaLevel - sea Y level
-spawnable - specifies what can spawn on the planet e.g. <spawnable weight="1" groupMin="1" groupMax="5">minecraft:villager</spawnable>
-biomeIds - biomes that can generate on the planet, IDs only
-artifact - items needed to travel to the planet via warp controller e.g. <artifact>minecraft:coal 1</artifact>
-generateCraters - generates the specified structure
-generateCaves - generates the specified structure
-generateVolcanos - generates the specified structure
-generateStructures - generates the specified structure
-generateGeodes - generates the specified structure
-avgTemperature - Average temperature
-retrograde - ???
-
-
-Planet Specifications List
-name - name
-DIMID - dimension id (usually higher than 3 for mostly vanilla gameplays, but higher is safer)
-dimMapping - add this with an empty string if the dimension already exists and you just wanna turn it into a planet
-customIcon - string containing either a default icon or a custom icon
-*/
-
-
-
-/*
-#####################################((((((((((((###################((((##((((((
-#######################################(((((((((##########################((((((
-########################################(((((((#############################(###
-#########################################(((((##################################
-########################################(((((###################################
-############################/, /(#########(((###################################
-###############((////***,,,,,*.    ,(#######(###################################
-#############.*################((/ ,  .(##((####################################
-############( ###################/ /(,    ./####################################
-############./###################(.  /###*                   *##################
-######%####/ ##%################*  *####(. . (#*. .*##(((#######################
-#######%###.(############%####, /(./###( (### /######,  *(######################
-#####%%%##/ ##%%##%%%##%#%###/ ##(./####.(###(.##########/ *####################
-##########.*##%##%%%%%%%%%####( (#./####,.###( ############# *##################
-,,         ., /(#########%#%%### (./####( #### ##############(.,################
-(((((((((((((///*,,,.       ., /( .,##### /###,(################.,##############
-((((((((((((((((((((((((((((((((//,,.           *((###############.,############
-((((((((((((((((((((((((((((((((((((((((((((((((((//*,.        ., /(. *#########
-((((((((((((((((((((((((((((##(((((((((((((((#(((((((((((((((((((///*,,.        
-(((((((((((((((((((((((((((((#((((((((((((((((((((((((((((((((((((((((((((((((((
-#######((((((((((((((((((((((#((((((((((((((((((((/(((((w(((((((((((((((((((((((
-
-
-
-
-
+KKKKKKKKKKKKKKKKKKKKKKKKKKKK0KKKKKKKKKKKKKKKK
+KKKKKKKKKKKKKKKOkxddooooddxkO0KKKKKKKKKKKKKKK
+KKKKKKKKK0K0xooooddxdlcdxdooooox0KKKKK0KKKKKK
+000000000OolldO0K00KOdokK00K0OdlldO0000000000
+0000000Odclk00000kxdlccldxk00000klcdO00000000
+000000klcx0000koloooddddooolok0000xclk0000000
+OOOOOkcckOOOkl;:oxkkkkkkkkxo:,lkOOOkcck0OOOOO
+OOOOOl:xOOOk:  ..,;;::::;;,.. .:kOOOx:lOOOOOO
+OOOOx:cOOOOl.  .,,;cllllc;,,.  .lOOOOc:xOOOOO
+kkkOd;lOkOx;   ',;codxxdoc;,'   ;kOkOl;dOkkkk
+kkkkd;lkkkk:   .,,:loddol:,,.   :xkkkl;dkkkkk
+kkkkx::xkkxl.   .',;;:::;,'..  .okkkx::xkkkkk
+xxxxko;cxxdoc..';:ccccccccc;'..lxxxxl;okxxxxx
+xxxxxxl;lxxdolc:codxxxxxxdlc:coxxxxl;lxxxxxxx
+xxxxxxxl;:oxxxxdlcccc::ccccldxxxxo:;lxxxxxxxx
+dddddddxoc;:ldxddxddl::ccodddxdl:;:oddddddddd
+ddddddddddoc:::cloddo::looolc::;coddddddddddd
+dddddddddddddoc:::::;,,;:::::codddddddddddddd
+oooooooooooodooddooolllloooddoooooooooooooooo
+ooooooooooooooooooooooooooooooooooooooooooooo
 */

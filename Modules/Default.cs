@@ -2,12 +2,12 @@ using System.Xml.Linq;
 
 namespace Modules
 {
-    class DefaultSol
+    class Default
     {
         /// <summary>
-        /// Generates the Sol, Earth, and Luna, referencing from my automatically generated planetDefs.xml file.
+        /// Generates the Sol, Earth, and Luna, referencing from the automatically generated planetDefs.xml file.
         /// </summary>
-        public static XElement Default()
+        public static XElement Sol()
 
         {
             return
