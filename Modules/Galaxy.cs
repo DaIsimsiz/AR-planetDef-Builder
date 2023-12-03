@@ -9,6 +9,7 @@ namespace Modules
         public class Galaxy
         {
             #pragma warning disable //We *do* want to get null references.
+                                    //Getting a null reference will be helpful to decide if the element exists or not. This will be accounted for in the rest of the code.
             XDocument Document = new(new XElement("galaxy", Modules.Default.Sol()))
             {
                 Declaration = new XDeclaration("1.0", "UTF-8", "no")
@@ -47,7 +48,7 @@ namespace Modules
 
 
             /// <summary>
-            /// Changes/Removes the property at the specified path.
+            /// Changes the property at the specified path. (Sending a null string deletes the property instead.)
             /// </summary>
             public void SetProperty(string path, string value)
             {
@@ -55,7 +56,7 @@ namespace Modules
                 Document.XPathSelectElement(path).Remove();
             }
             /// <summary>
-            /// Changes/Removes/Adds the property at the specified path.
+            /// Changes/Adds the property at the specified path.
             /// </summary>
             public void SetProperty(string path, XElement property)
             {
@@ -103,8 +104,8 @@ namespace Modules
             /// Goes back to the previous element.
             /// </summary>
             public void Back(){
-                if(FullPath == @".\galaxy") return;
-                else{FullPath = FullPath[..FullPath.LastIndexOf('\\')];}
+                if(FullPath == @"./galaxy") return;
+                else{FullPath = FullPath[..FullPath.LastIndexOf('/')];}
             }
         }
     }

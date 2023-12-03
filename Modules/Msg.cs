@@ -3,7 +3,7 @@ namespace Modules
     class Msg
     {
         /// <summary>
-        /// Cleans the console and sends the new messages.
+        /// Sends a console message with some extra operations. Optionally, cleans console.
         /// </summary>
         public static void SendMessages(bool clean = true, params string[] messages)
         {

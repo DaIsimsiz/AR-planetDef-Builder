@@ -5,7 +5,7 @@ namespace Modules
     class Interface
     {
         /// <summary>
-        /// Writes the children of the element of your choice.
+        /// Neatly organizes and shows all elements and attributes of an XElement.
         /// </summary>
         public static void LoadObject(XElement body)
         {
@@ -53,9 +53,10 @@ namespace Modules
                     default      : Console.Write($"> {body.Elements().ElementAt(i).Value}");break;
                     #pragma warning restore
                 }
-                Console.WriteLine();
+                Console.WriteLine("\n");
             }
         }
+
         /// <summary>
         /// Enables the user to modify a value of your choice.
         /// </summary>
@@ -63,6 +64,7 @@ namespace Modules
         {
             Console.Clear();
             foreach(string message in messages) Console.WriteLine(message);
+            //???
         }
     }
 }
