@@ -1,6 +1,9 @@
 namespace Modules
 {
-    class Msg
+    /// <summary>
+    /// A class with very basic methods, this prevents me from having to use the same lines multiple times, and polluting the code.
+    /// </summary>
+    class Basics
     {
         /// <summary>
         /// Sends a console message with some extra operations. Optionally, cleans console.

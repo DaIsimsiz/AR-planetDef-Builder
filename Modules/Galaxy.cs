@@ -4,13 +4,20 @@ using System.Text.RegularExpressions;
 
 namespace Modules
 {
-    class PlanetDef
+    /// <summary>
+    /// A class housing all methods related to manipulating the planetDefs XML document.
+    /// </summary>
+    class PlanetDefs
     {
+        /// <summary>
+        /// A custom made Galaxy class, made to make the job of editing the galaxy a lot easier.
+        /// Without this, the code would definitely be a lot longer and confusing.
+        /// </summary>
         public class Galaxy
         {
             #pragma warning disable //We *do* want to get null references.
                                     //Getting a null reference will be helpful to decide if the element exists or not. This will be accounted for in the rest of the code.
-            XDocument Document = new(new XElement("galaxy", Modules.Default.Sol()))
+            XDocument Document = new(new XElement("galaxy", Modules.References.Sol()))
             {
                 Declaration = new XDeclaration("1.0", "UTF-8", "no")
             };
@@ -69,14 +76,24 @@ namespace Modules
             /// Exports the galaxy into a file.
             /// </summary>
             public void Export(string path = null) {
-                //Console.WriteLine(Document);
                 Document.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\planetDefsEXPORT.xml");
             }
         }
 
+        /// <summary>
+        /// A path class custom made to make the job of keeping track of our current path a lot easier.
+        /// </summary>
         public class Path
         {
-            public string FullPath = @"./galaxy";
+            public string FullPath;
+
+            /// <summary>
+            /// The constructor will default to the root, but you can set a custom path as the starting point.
+            /// This is added to hard-code one thing less.
+            /// </summary>
+            public Path(string fullpath = @"./galaxy") {
+                this.FullPath = fullpath;
+            }
             
             /// <summary>
             /// Returns the element the path currently points at.

@@ -2,6 +2,9 @@ using System.Xml.Linq;
 
 namespace Modules
 {
+    /// <summary>
+    /// A class with methods with the purpose of sending messages in the console in a way that makes it easy for the user to interpret what is happening.
+    /// </summary>
     class Interface
     {
         /// <summary>
