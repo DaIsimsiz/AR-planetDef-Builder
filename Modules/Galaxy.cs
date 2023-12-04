@@ -49,7 +49,8 @@ namespace Modules
             /// </summary>
             public void SetAttribute(string path, string attributeName, string value)
             {
-                Document.XPathSelectElement(path).Attribute(attributeName).Value = value;
+                if(value == null) Document.XPathSelectElement(path).Attribute(attributeName).Remove();
+                else Document.XPathSelectElement(path).Attribute(attributeName).Value = value;
             }
 
 

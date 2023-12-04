@@ -60,12 +60,49 @@ namespace ARplanetDefBuilder
             if(input.StartsWith("edit ")) {
                 if(input[5] == 'p' && int.TryParse(input[6..], out _)) {
                     if(int.Parse(input[6..]) < galaxy.GetProperty(path.FullPath).Elements().Count()) {
-                        int index = 0;
-                        string name = galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[6..])).Name.ToString();
-                        for(int i = 0;i <= int.Parse(input[6..]);i++) {
-                            if(galaxy.GetProperty(path.FullPath).Elements().ElementAt(i).Name.ToString() == name) index++;
+                        if(galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[6..])).Name.ToString() == "star" ||
+                            galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[6..])).Name.ToString() == "planet") {
+                            int index = 0;
+                            string name = galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[6..])).Name.ToString();
+                            for(int i = 0;i <= int.Parse(input[6..]);i++) {
+                                if(galaxy.GetProperty(path.FullPath).Elements().ElementAt(i).Name.ToString() == name) index++;
+                            }
+                            path.GoTo(name, index);
                         }
-                        path.GoTo(name, index);
+                        else {
+                            int index = 0;
+                            string name = galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[6..])).Name.ToString();
+                            for(int i = 0;i <= int.Parse(input[6..]);i++) {
+                                if(galaxy.GetProperty(path.FullPath).Elements().ElementAt(i).Name.ToString() == name) index++;
+                            }
+                            while(true) {
+                                SendMessages(true, $"Enter a new valid value for {name}.");
+                                #pragma warning disable
+                                input = Console.ReadLine();
+                                if(Modules.StellarGen.IsValid(name, input)) {
+                                #pragma warning disable
+                                    path.GoTo(name, index);
+                                    galaxy.SetProperty(path.FullPath, input);
+                                    path.Back();
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if(input[5] == 'a' && int.TryParse(input[6..], out _)) {
+                    if(int.Parse(input[6..]) < galaxy.GetProperty(path.FullPath).Attributes().Count()) {
+                        string attribute = galaxy.GetProperty(path.FullPath).Attributes().ElementAt(int.Parse(input[6..])).Name.ToString();
+                        while(true) {
+                            SendMessages(true, $"Enter a new valid value for {attribute}.");
+                            #pragma warning disable
+                            input = Console.ReadLine();
+                            if(Modules.StellarGen.IsValid(attribute, input)) {
+                            #pragma warning disable
+                                galaxy.SetAttribute(path.FullPath, attribute, input);
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -112,9 +149,34 @@ namespace ARplanetDefBuilder
                         }
                     }
                 }
+                if(input[4] == 'a' && int.TryParse(input[5..], out _)) {
+                    if(int.Parse(input[5..]) < galaxy.GetProperty(path.FullPath).Attributes().Count()) {
+                        string displayName = galaxy.GetProperty(path.FullPath).Attributes().ElementAt(int.Parse(input[5..])).Name.ToString();
+                        while(true) {
+                            SendMessages(true,
+                                $"Are you sure you want to delete {displayName}?",
+                                "y/n");
+
+                            #pragma warning disable
+                            input = Console.ReadLine().ToLower();
+                            #pragma warning restore
+
+                            if(input == "y") {
+                                galaxy.SetAttribute(path.FullPath, displayName, string.Empty);
+                                break;
+                            }
+                            else if(input == "n") break;
+                        }
+                    }
+                }
             }
             else if(input.StartsWith("back")) {
                 path.Back();
+            }
+            else if(input.StartsWith("export") && path.Depth() == 1) {
+                //Prompt custom export location
+                //Save the export location for later but still prompt if they wanna use the same location
+                galaxy.Export();
             }
             else if(input.StartsWith("new ")) {
                 switch(path.Depth(), input[4..]) {
@@ -149,39 +211,45 @@ namespace ARplanetDefBuilder
                         }
                         break; //New planet
                     case (2, "attribute"):
-                        //what do i do here
+                        (string, string) attInfoS = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.StarAttributes);
+                        galaxy.SetAttribute(path.FullPath, attInfoS.Item1, attInfoS.Item2);
                         break; //New star attribute
                     
 
 
                     case (3, "attribute"):
                         if(path.Last() == "star") {
-                            //Binary star attribute
+                            (string, string) attInfoB = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.StarAttributes);
+                            galaxy.SetAttribute(path.FullPath, attInfoB.Item1, attInfoB.Item2);
                         } //Binary star attribute
                         else {
-                            //Planet attribute
+                            (string, string) attInfoP = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.PlanetAttributes);
+                            galaxy.SetAttribute(path.FullPath, attInfoP.Item1, attInfoP.Item2);
                         } //Planet attribute
                         break;
                     case (3, "property"):
                         if(path.Last() == "star") break;
                         else {
-                            //New planet property
+                            (string, string) attInfoP = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.PlanetAttributes);
+                            galaxy.SetAttribute(path.FullPath, attInfoP.Item1, attInfoP.Item2);
                         }
                         break; //New planet property
                     case (3, "moon"):
                         if(path.Last() == "star") break;
                         else {
-                            //New moon
+                            galaxy.SetProperty(path.FullPath, Modules.StellarGen.NewPlanet());
                         }
                         break; //New moon
 
 
 
                     case (4, "attribute"):
-                        //
+                        (string, string) attInfoM = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.PlanetAttributes);
+                        galaxy.SetAttribute(path.FullPath, attInfoM.Item1, attInfoM.Item2);
                         break; //New moon attribute
                     case (4, "property"):
-                        //
+                        (string, string) propInfoM = MissingProperties(galaxy.GetProperty(path.FullPath));
+                        galaxy.SetProperty(path.FullPath, new XElement(propInfoM.Item1, propInfoM.Item2));
                         break; //New moon property
                 }
             }

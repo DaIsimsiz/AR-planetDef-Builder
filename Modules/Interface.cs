@@ -1,3 +1,5 @@
+using static Modules.Basics;
+
 using System.Xml.Linq;
 
 namespace Modules
@@ -61,13 +63,71 @@ namespace Modules
         }
 
         /// <summary>
-        /// Enables the user to modify a value of your choice.
+        /// Prompts the user to modify the attribute of their choice.
         /// </summary>
-        public static void ModifyValue(params string[] messages)
+        public static (string, string) MissingAttributes(XElement body, Dictionary<string, string> dict)
         {
-            Console.Clear();
-            foreach(string message in messages) Console.WriteLine(message);
-            //???
+            List<string> missing = body.Attributes().Where(att => body.Attributes().All(bodyAtt => bodyAtt.Name != att.Name)).Select(att => att.Name.ToString()).ToList();
+            for(int i = 0;i < 0;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
+            string? input;
+            string attributeN;
+            string value;
+
+            while(true) {
+                SendMessages(true, "Here is a list of attributes you may add:\n");
+                foreach(string a in missing) Console.WriteLine(a);
+                Console.WriteLine();
+                input = Console.ReadLine();
+                #pragma warning disable
+                if(!missing.Contains(input)) continue;
+                #pragma warning restore
+                else{attributeN = input;break;}
+            }
+            while(true) {
+                SendMessages(true, $"Enter a valid value for {attributeN}\n{dict[attributeN]}\n");
+                input = Console.ReadLine();
+                #pragma warning disable
+                if(!StellarGen.IsValid(attributeN, input)) continue;
+                #pragma warning restore
+                value = input;
+                return (attributeN, value);
+            }
+        }
+        /// <summary>
+        /// Prompts the user to modify the property of their choice.
+        /// </summary>
+        public static (string, string) MissingProperties(XElement body)
+        {
+            Dictionary <string, string> dict = References.TerrestrialPlanetSpecifications;
+            foreach(var KVPair in References.GaseousPlanetSpecifications) {
+                if(!dict.ContainsKey(KVPair.Key)) dict.Add(KVPair.Key, KVPair.Value);
+            }
+
+            List<string> missing = body.Elements().Where(prop => body.Elements().All(bodyProp => bodyProp.Name != prop.Name)).Select(prop => prop.Name.ToString()).ToList();
+            for(int i = 0;i < 0;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
+            string? input;
+            string propertyName;
+            string value;
+
+            while(true) {
+                SendMessages(true, "Here is a list of properties you may add:\n");
+                foreach(string a in missing) Console.WriteLine(a);
+                Console.WriteLine();
+                input = Console.ReadLine();
+                #pragma warning disable
+                if(!missing.Contains(input)) continue;
+                #pragma warning restore
+                else{propertyName = input;break;}
+            }
+            while(true) {
+                SendMessages(true, $"Enter a valid value for {propertyName}\n{dict[propertyName]}\n");
+                input = Console.ReadLine();
+                #pragma warning disable
+                if(!StellarGen.IsValid(propertyName, input)) continue;
+                #pragma warning restore
+                value = input;
+                return (propertyName, value);
+            }
         }
     }
 }

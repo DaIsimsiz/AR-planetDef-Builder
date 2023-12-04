@@ -137,6 +137,52 @@ namespace Modules
                 } //oooh my god
             }
         }
+
+
+        static public bool IsValid(string e, string value) {
+            string type;
+
+            if(References.PlanetAttributesValid.ContainsKey(e)) {type = References.PlanetAttributesValid[e];}
+            else if(References.TerrestrialPlanetSpecificationsValid.ContainsKey(e)) {type = References.TerrestrialPlanetSpecificationsValid[e];}
+            else if(References.GaseousPlanetSpecificationsValid.ContainsKey(e)) {type = References.GaseousPlanetSpecificationsValid[e];}
+            else if(References.BinaryStarAttributesValid.ContainsKey(e)) {type = References.BinaryStarAttributesValid[e];}
+            else if(References.StarAttributesValid.ContainsKey(e)) {type = References.StarAttributesValid[e];}
+            else if(References.SpawnableAttributesValid.ContainsKey(e)) {type = References.SpawnableAttributesValid[e];}
+            else{throw new NullReferenceException();}
+
+            switch(type) {
+                case "int":
+                    return int.TryParse(value, out _);
+                case "empty":
+                    return (value == String.Empty || value == "");
+                case "bool":
+                    return bool.TryParse(value, out _);
+                case "float":
+                    return float.TryParse(value, out _);
+                case "special":
+                    switch(e) {
+                        case "fogColor":
+                            foreach(string f in value.Split(',')) {
+                                if(!float.TryParse(f, out _)) return false;
+                            }
+                            return true;
+                        case "skyColor":
+                            foreach(string f in value.Split(',')) {
+                                if(!float.TryParse(f, out _)) return false;
+                            }
+                            return true;
+                        case "ringColor":
+                            foreach(string f in value.Split(',')) {
+                                if(!float.TryParse(f, out _)) return false;
+                            }
+                            return true;
+                        default:
+                            return true;
+                    }
+                default:
+                    return true;
+            }
+        }//Public method to check value validation
     }
 } 
 

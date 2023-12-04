@@ -170,5 +170,107 @@ namespace Modules
                 { "groupMax", "Maximum amount of mobs to spawn." },
                 { "nbt", "NBT tags to change various stuff about the mob." }
             };
+        /// <summary>
+        /// A list of attributes a planet may have.
+        /// </summary>
+        static public Dictionary<string, string> PlanetAttributesValid = new()
+        {
+                { "name", "string" },
+                { "DIMID", "int"},
+                { "dimMapping", "empty" },
+                { "customIcon", "string"}
+            };
+        /// <summary>
+        /// A list of properties a terrestrial planet may have.
+        /// </summary>
+        static public Dictionary<string, string> TerrestrialPlanetSpecificationsValid = new()
+            {
+                { "isKnown", "bool" },
+                { "hasRings", "bool" },
+                { "genType", "int" },
+                { "fogColor", "special" },
+                { "skyColor", "special" },
+                { "atmosphereDensity", "int" },
+                { "hasOxygen", "bool" },
+                { "gravitationalMultiplier", "int" },
+                { "orbitalDistance", "int" },
+                { "orbitalTheta", "int" },
+                { "orbitalPhi", "int" },
+                { "rotationalPeriod", "int" },
+                { "fillerBlock", "string" },
+                { "oceanBlock", "string" },
+                { "seaLevel", "int" },
+                { "spawnable", "unknown" },
+                { "biomeIds", "string" },
+                { "artifact", "string" },
+                { "generateCraters", "bool" },
+                { "generateCaves", "bool" },
+                { "generateVolcanos", "bool" },
+                { "generateStructures", "bool" },
+                { "generateGeodes", "bool" },
+                { "avgTemperature", "int" },
+                { "retrograde", "bool" },
+                { "ringColor", "special" },
+                { "forceRiverGeneration", "bool" },
+                { "oreGen", "unknown" },
+                { "laserDrillOres", "unknown" },
+                { "geodeOres", "string" },
+                { "craterOres", "string" },
+                { "craterBiomeWeights", "unknown" },
+                { "craterFrequencyMultiplier", "unknown" },
+                { "volcanoFrequencyMultiplier", "unknown" },
+                { "geodefrequencyMultiplier", "unknown" },
+                { "hasShading", "bool" },
+                { "hasColorOverride", "bool" },
+                { "skyRenderOverride", "bool" }
+            };
+        /// <summary>
+        /// A list of properties a gaseous planet may have.
+        /// </summary>
+        static public Dictionary<string, string> GaseousPlanetSpecificationsValid = new()
+            {
+                { "isKnown", "bool" },
+                { "GasGiant", "bool" },
+                { "gas", "string" },
+                { "orbitalDistance", "int" },
+                { "orbitalTheta", "int" },
+                { "retrograde", "bool" },
+            };
+        /// <summary>
+        /// A list of attributes a binary star may have.
+        /// </summary>
+        static public Dictionary<string, string> BinaryStarAttributesValid = new()
+            {
+                { "temp", "int" },
+                { "blackHole", "bool" },
+                { "size", "float" },
+
+                { "separation", "int" }
+            };
+        /// <summary>
+        /// A list of attributes a main star may have.
+        /// </summary>
+        static public Dictionary<string, string> StarAttributesValid = new()
+            {
+                { "temp", "int" },
+                { "blackHole", "bool" },
+                { "size", "float" },
+
+                { "name", "string" },
+                { "numPlanets", "int" },
+                { "numGasGiants", "int" },
+                { "x", "int" },
+                { "y", "int" }
+            };
+        /// <summary>
+        /// A list of attributes the <spawnable> property may have.
+        /// </summary>
+        static public Dictionary<string, string> SpawnableAttributesValid = new()
+            {
+                { "weight", "int" },
+                { "groupMin", "int" },
+                { "groupMax", "int" },
+                { "nbt", "unknown" }
+            };
     }
 }
