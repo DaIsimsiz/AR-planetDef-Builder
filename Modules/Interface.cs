@@ -28,11 +28,9 @@ namespace Modules
             Console.Write($"Body name: ");
 
             switch(body.Name.ToString()) {
-                #pragma warning disable
                 case "galaxy": Console.WriteLine("Galaxy");break;
                 case "star"  : Console.WriteLine(body.Attribute("name").Value);break;
                 case "planet": Console.WriteLine(body.Attribute("name").Value);break;
-                #pragma warning restore
             }
 
             Console.WriteLine("\nAttributes:");
@@ -52,11 +50,9 @@ namespace Modules
                 Console.Write($" | {body.Elements().ElementAt(i).Name} ");
                 for(int x = body.Elements().ElementAt(i).Name.ToString().Length; x < nameL; x++) {Console.Write(" ");}
                 switch(body.Elements().ElementAt(i).Name.ToString()) {
-                    #pragma warning disable
                     case "planet": Console.Write($"> {body.Elements().ElementAt(i).Attribute("name").Value}");break;
                     case "star"  : Console.Write($"> {body.Elements().ElementAt(i).Attribute("name").Value}");break;
                     default      : Console.Write($"> {body.Elements().ElementAt(i).Value}");break;
-                    #pragma warning restore
                 }
                 Console.WriteLine("\n");
             }
@@ -78,17 +74,13 @@ namespace Modules
                 foreach(string a in missing) Console.WriteLine(a);
                 Console.WriteLine();
                 input = Console.ReadLine();
-                #pragma warning disable
                 if(!missing.Contains(input)) continue;
-                #pragma warning restore
                 else{attributeN = input;break;}
             }
             while(true) {
                 SendMessages(true, $"Enter a valid value for {attributeN}\n{dict[attributeN]}\n");
                 input = Console.ReadLine();
-                #pragma warning disable
                 if(!StellarGen.IsValid(attributeN, input)) continue;
-                #pragma warning restore
                 value = input;
                 return (attributeN, value);
             }
@@ -114,17 +106,13 @@ namespace Modules
                 foreach(string a in missing) Console.WriteLine(a);
                 Console.WriteLine();
                 input = Console.ReadLine();
-                #pragma warning disable
                 if(!missing.Contains(input)) continue;
-                #pragma warning restore
                 else{propertyName = input;break;}
             }
             while(true) {
                 SendMessages(true, $"Enter a valid value for {propertyName}\n{dict[propertyName]}\n");
                 input = Console.ReadLine();
-                #pragma warning disable
                 if(!StellarGen.IsValid(propertyName, input)) continue;
-                #pragma warning restore
                 value = input;
                 return (propertyName, value);
             }

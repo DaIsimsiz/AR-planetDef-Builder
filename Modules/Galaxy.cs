@@ -15,8 +15,6 @@ namespace Modules
         /// </summary>
         public class Galaxy
         {
-            #pragma warning disable //We *do* want to get null references.
-                                    //Getting a null reference will be helpful to decide if the element exists or not. This will be accounted for in the rest of the code.
             XDocument Document = new(new XElement("galaxy", Modules.References.Sol()))
             {
                 Declaration = new XDeclaration("1.0", "UTF-8", "no")

@@ -45,7 +45,6 @@ namespace Modules
         /// Creates a new planet.
         /// </summary>
         public static XElement NewPlanet() {
-            #pragma warning disable
             string? input;
             bool gaseous = false;
             XElement planet = new XElement("planet");
