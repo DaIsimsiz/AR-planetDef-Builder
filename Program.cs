@@ -3,15 +3,23 @@ using static Modules.Interface;
 using static Modules.Basics;
 
 using System.Xml.Linq;
-using System.Text.RegularExpressions;
-using System.Xml.XPath;
+using System.Text.Json;
+
 
 namespace ARplanetDefBuilder
 {
+    class AppData
+    {
+        public string saveDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+
+        public bool neverAsk = false;
+    }
     class Program
     {
         static readonly Galaxy galaxy = new();
         static readonly Modules.PlanetDefs.Path path = new();
+
+        static readonly string dataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder";
 
         static void Main()
         {
@@ -19,9 +27,9 @@ namespace ARplanetDefBuilder
             while(true) {
                 LoadObject(galaxy.GetProperty(path.FullPath));
                 InputPrompt();
-                #pragma warning disable
+                
                 input = Console.ReadLine().ToLower();
-                #pragma warning restore
+                
                 AnalyzeInput(input);
             }
         }
@@ -50,13 +58,14 @@ namespace ARplanetDefBuilder
             SendMessages(false,
                     "edit <ID>    => Modify the specified property/attribute",
                     "del <ID>     => Delete the specified property/attribute",
-                    "back         => Go back one step");
+                    "back         => Go back one step",
+                    "export       => Export the galaxy to desktop");
         }
 
         /// <summary>
         /// Analyzes the given input with regard for the current element.
         /// </summary>
-        static void AnalyzeInput(string input){
+        static void AnalyzeInput(string? input){
             if(input.StartsWith("edit ")) {
                 if(input[5] == 'p' && int.TryParse(input[6..], out _)) {
                     if(int.Parse(input[6..]) < galaxy.GetProperty(path.FullPath).Elements().Count()) {
@@ -77,10 +86,10 @@ namespace ARplanetDefBuilder
                             }
                             while(true) {
                                 SendMessages(true, $"Enter a new valid value for {name}.");
-                                #pragma warning disable
+                                
                                 input = Console.ReadLine();
                                 if(Modules.StellarGen.IsValid(name, input)) {
-                                #pragma warning disable
+                                
                                     path.GoTo(name, index);
                                     galaxy.SetProperty(path.FullPath, input);
                                     path.Back();
@@ -95,10 +104,10 @@ namespace ARplanetDefBuilder
                         string attribute = galaxy.GetProperty(path.FullPath).Attributes().ElementAt(int.Parse(input[6..])).Name.ToString();
                         while(true) {
                             SendMessages(true, $"Enter a new valid value for {attribute}.");
-                            #pragma warning disable
+                            
                             input = Console.ReadLine();
                             if(Modules.StellarGen.IsValid(attribute, input)) {
-                            #pragma warning disable
+                            
                                 galaxy.SetAttribute(path.FullPath, attribute, input);
                                 break;
                             }
@@ -124,9 +133,9 @@ namespace ARplanetDefBuilder
                                 galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[5..])).Name.ToString() == "planet"
                             )
                                 ?
-                                    #pragma warning disable
+                                    
                                     galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[5..])).Attribute("name").Value.ToString()
-                                    #pragma warning restore
+                                    
                                 :
                                     galaxy.GetProperty(path.FullPath).Elements().ElementAt(int.Parse(input[5..])).Name.ToString();
                         ///// Fancy ternary operator
@@ -135,9 +144,9 @@ namespace ARplanetDefBuilder
                                 $"Are you sure you want to delete {displayName}?",
                                 "y/n");
 
-                            #pragma warning disable
+                            
                             input = Console.ReadLine().ToLower();
-                            #pragma warning restore
+                            
 
                             if(input == "y") {
                                 path.GoTo(name, index);
@@ -157,9 +166,9 @@ namespace ARplanetDefBuilder
                                 $"Are you sure you want to delete {displayName}?",
                                 "y/n");
 
-                            #pragma warning disable
+                            
                             input = Console.ReadLine().ToLower();
-                            #pragma warning restore
+                            
 
                             if(input == "y") {
                                 galaxy.SetAttribute(path.FullPath, displayName, string.Empty);
@@ -174,9 +183,43 @@ namespace ARplanetDefBuilder
                 path.Back();
             }
             else if(input.StartsWith("export") && path.Depth() == 1) {
-                //Prompt custom export location
-                //Save the export location for later but still prompt if they wanna use the same location
-                galaxy.Export();
+                AppData data;
+                bool changed = false;
+                bool loop = true;
+                if(!Directory.Exists(dataDir)) Directory.CreateDirectory(dataDir);
+                if(!File.Exists(dataDir + @"\saveDir.json")) File.Create(dataDir + @"\saveDir.json");
+                data = ValidData(File.ReadAllText(dataDir));
+                while(!data.neverAsk && loop) {
+                    SendMessages(true, "Current export directory is:", $"{data.saveDirectory}", "Enter \"continue\" if you want to proceed (enter \"continue -neverAsk\" if you don't want to see this message anymore)", "Enter \"edit\" if you want to change the directory");
+                    switch (Console.ReadLine().ToLower()) {
+                        case "continue -neverask":
+                            data.neverAsk = true;
+                            changed = true;
+                            loop = false;
+                            break;
+                        case "continue":
+                            loop = false;
+                            break;
+                        case "edit":
+                            while(true) {
+                                SendMessages(true, "Enter a new calid directory");
+                                
+                                input = Console.ReadLine();
+                                
+                                if(!Directory.Exists(input)) continue;
+                                else {
+                                    data.saveDirectory = input;
+                                    changed = true;
+                                    loop = false;
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+                }
+                if(changed) File.WriteAllText(dataDir, JsonSerializer.Serialize(data));
+                galaxy.Export(data.saveDirectory);
+                System.Environment.Exit(1);
             }
             else if(input.StartsWith("new ")) {
                 switch(path.Depth(), input[4..]) {
@@ -193,16 +236,16 @@ namespace ARplanetDefBuilder
                     case (2, "planet"):
                         while(true) {
                             SendMessages(true, "Would you like the planet to be generated randomly?", "y/n");
-                            #pragma warning disable
+                            
                             input = Console.ReadLine().ToLower();
-                            #pragma warning restore
+                            
                             if(input == "n") {galaxy.SetProperty(path.FullPath, Modules.StellarGen.NewPlanet());break;}
                             else{
                                 while(true) {
                                     SendMessages(true, "Should the planet be Gaseous or Terrestrial?", "gaseous/terrestrial");
-                                    #pragma warning disable
+                                    
                                     input = Console.ReadLine().ToLower();
-                                    #pragma warning restore
+                                    
                                     if(input == "terrestrial") {galaxy.SetAttribute(path.FullPath, "numPlanets", (int.Parse(galaxy.GetAttribute(path.FullPath, "numPlanets").Value.ToString()) + 1).ToString());break;}
                                     else if(input == "gaseous") {galaxy.SetAttribute(path.FullPath, "numGasGiants", (int.Parse(galaxy.GetAttribute(path.FullPath, "numGasGiants").Value.ToString()) + 1).ToString());break;}
                                 }
@@ -253,6 +296,13 @@ namespace ARplanetDefBuilder
                         break; //New moon property
                 }
             }
+        }
+        static AppData ValidData(string data) {
+            try
+            {
+                return JsonSerializer.Deserialize<AppData>(data);
+            }
+            catch(Exception) {return new AppData();}
         }
     }
 }

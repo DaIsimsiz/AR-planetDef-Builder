@@ -52,7 +52,7 @@ namespace Modules
 
             while(true) {
                 SendMessages(true, "Is the planet gaseous?\n y/n");
-                input = Console.ReadLine();
+                input = Console.ReadLine().ToLower();
                 if(input == "y") {gaseous = true;break;}
                 else if(input == "n") {gaseous = false;break;}
             }
@@ -139,7 +139,7 @@ namespace Modules
         }
 
 
-        static public bool IsValid(string e, string value) {
+        static public bool IsValid(string e, string? value) {
             string type;
 
             if(References.PlanetAttributesValid.ContainsKey(e)) {type = References.PlanetAttributesValid[e];}

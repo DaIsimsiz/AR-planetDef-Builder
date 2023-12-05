@@ -74,7 +74,7 @@ namespace Modules
             string value;
 
             while(true) {
-                SendMessages(true, "Here is a list of attributes you may add:\n");
+                SendMessages(true, "Here is a list of attributes you may add (cAsE sEnSiTiVe):\n");
                 foreach(string a in missing) Console.WriteLine(a);
                 Console.WriteLine();
                 input = Console.ReadLine();
@@ -110,7 +110,7 @@ namespace Modules
             string value;
 
             while(true) {
-                SendMessages(true, "Here is a list of properties you may add:\n");
+                SendMessages(true, "Here is a list of properties you may add (cAsE sEnSiTiVe):\n");
                 foreach(string a in missing) Console.WriteLine(a);
                 Console.WriteLine();
                 input = Console.ReadLine();
