@@ -23,9 +23,11 @@ namespace ARplanetDefBuilder
 
         static void Main()
         {
+            Console.Title = "planetDefs Builder";
             string? input;
             while(true) {
                 LoadObject(galaxy.GetProperty(path.FullPath));
+                Console.WriteLine();
                 InputPrompt();
                 
                 input = Console.ReadLine().ToLower();
@@ -158,7 +160,7 @@ namespace ARplanetDefBuilder
                         }
                     }
                 }
-                if(input[4] == 'a' && int.TryParse(input[5..], out _)) {
+                else if(input[4] == 'a' && int.TryParse(input[5..], out _)) {
                     if(int.Parse(input[5..]) < galaxy.GetProperty(path.FullPath).Attributes().Count()) {
                         string displayName = galaxy.GetProperty(path.FullPath).Attributes().ElementAt(int.Parse(input[5..])).Name.ToString();
                         while(true) {
