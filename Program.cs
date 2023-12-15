@@ -1,4 +1,4 @@
-﻿using static Modules.PlanetDefs;
+using static Modules.PlanetDefs;
 using static Modules.Interface;
 using static Modules.Basics;
 
@@ -188,10 +188,14 @@ namespace ARplanetDefBuilder
                 AppData data;
                 bool changed = false;
                 bool loop = true;
-                if(!Directory.Exists(dataDir)) Directory.CreateDirectory(dataDir);
-                if(!File.Exists(dataDir + @"\saveDir.json")) File.Create(dataDir + @"\saveDir.json");
-                data = ValidData(File.ReadAllText(dataDir));
-                while(!data.neverAsk && loop) {
+                if (!Directory.Exists(dataDir)) Directory.CreateDirectory(dataDir);
+                if (!File.Exists(dataDir + @"\saveDir.json"))
+                {
+                    FileStream fse = File.Create(dataDir + @"\saveDir.json");
+                    fse.Close();
+                }
+                data = ValidData(File.ReadAllText(dataDir + @"\saveDir.json"));
+                while (!data.neverAsk && loop) {
                     SendMessages(true, "Current export directory is:", $"{data.saveDirectory}", "Enter \"continue\" if you want to proceed (enter \"continue -neverAsk\" if you don't want to see this message anymore)", "Enter \"edit\" if you want to change the directory");
                     switch (Console.ReadLine().ToLower()) {
                         case "continue -neverask":
