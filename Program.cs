@@ -1,9 +1,9 @@
-using static Modules.PlanetDefs;
-using static Modules.Interface;
+﻿using static Modules.Interface;
 using static Modules.Basics;
 
 using System.Xml.Linq;
 using System.Text.Json;
+using System.Text;
 
 
 namespace ARplanetDefBuilder
@@ -13,13 +13,16 @@ namespace ARplanetDefBuilder
         public string saveDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
 
         public bool neverAsk = false;
+
+        public void DefaultSDir() {this.saveDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);return;}
     }
     class Program
     {
-        static readonly Galaxy galaxy = new();
+        static readonly Modules.PlanetDefs.Galaxy galaxy = new();
         static readonly Modules.PlanetDefs.Path path = new();
 
         static readonly string dataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder";
+        static readonly string dataFile = dataDir + @"\preferences.json";
 
         static void Main()
         {
@@ -181,51 +184,57 @@ namespace ARplanetDefBuilder
                     }
                 }
             }
-            else if(input.StartsWith("back")) {
+            else if(input.StartsWith("back") && path.Depth() > 1) {
                 path.Back();
             }
-            else if(input.StartsWith("export") && path.Depth() == 1) {
-                AppData data;
-                bool changed = false;
-                bool loop = true;
-                if (!Directory.Exists(dataDir)) Directory.CreateDirectory(dataDir);
-                if (!File.Exists(dataDir + @"\saveDir.json"))
-                {
-                    FileStream fse = File.Create(dataDir + @"\saveDir.json");
-                    fse.Close();
+            else if(input.StartsWith("export")) {
+                bool cancel = true;
+                while(true) {
+                    SendMessages(true, "Are you sure you want to export this galaxy?", "y/n");
+                    input = Console.ReadLine().ToLower();
+                    if(input == "n") break;
+                    else if(input == "y") {cancel = false;break;}
                 }
-                data = ValidData(File.ReadAllText(dataDir + @"\saveDir.json"));
-                while (!data.neverAsk && loop) {
-                    SendMessages(true, "Current export directory is:", $"{data.saveDirectory}", "Enter \"continue\" if you want to proceed (enter \"continue -neverAsk\" if you don't want to see this message anymore)", "Enter \"edit\" if you want to change the directory");
-                    switch (Console.ReadLine().ToLower()) {
-                        case "continue -neverask":
-                            data.neverAsk = true;
-                            changed = true;
-                            loop = false;
-                            break;
-                        case "continue":
-                            loop = false;
-                            break;
-                        case "edit":
-                            while(true) {
-                                SendMessages(true, "Enter a new calid directory");
-                                
-                                input = Console.ReadLine();
-                                
-                                if(!Directory.Exists(input)) continue;
-                                else {
-                                    data.saveDirectory = input;
-                                    changed = true;
-                                    loop = false;
-                                    break;
-                                }
+                if(cancel) {}
+                else{
+                    FileStream fs = new(dataFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    StreamReader sr = new(fs);
+                    AppData data = ValidData(sr.ReadToEnd());
+                    if(!data.neverAsk) {
+                        while(true) {
+                            
+                            SendMessages(
+                                true, 
+                                "Enter \"continue\" to proceed with exporting. (Use \"continue -neverAsk\" to not see this message again.)",
+                                "Enter a directory to change the export location.",
+                                $"Current: {data.saveDirectory}"
+                            );
+                            input = Console.ReadLine();
+                            if(input.ToLower() == "continue") {
+                                break;
                             }
-                            break;
+                            else if(input.ToLower() == "continue -neverask") {
+                                data.neverAsk = true;
+                                break;
+                            }
+                            else if(Directory.Exists(input)) {
+                                data.saveDirectory = input;
+                            }
+                        }
                     }
+                    Console.Clear();
+                    if(!Directory.Exists(data.saveDirectory)) {
+                        Console.WriteLine("Directory doesn't exist! Defaulting to desktop...");
+                        data.DefaultSDir();
+                    }
+                    sr.Close();
+                    StreamWriter sw = new(fs);
+                    sw.Write(JsonSerializer.Serialize(data));
+                    sw.Close();
+                    fs.Close();
+                    galaxy.Export(data.saveDirectory);
+                    Environment.Exit(0);
                 }
-                if(changed) File.WriteAllText(dataDir, JsonSerializer.Serialize(data));
-                galaxy.Export(data.saveDirectory);
-                System.Environment.Exit(1);
             }
             else if(input.StartsWith("new ")) {
                 switch(path.Depth(), input[4..]) {
@@ -261,6 +270,7 @@ namespace ARplanetDefBuilder
                         break; //New planet
                     case (2, "attribute"):
                         (string, string) attInfoS = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.StarAttributes);
+                        if(attInfoS == (null, null)) break;
                         galaxy.SetAttribute(path.FullPath, attInfoS.Item1, attInfoS.Item2);
                         break; //New star attribute
                     
@@ -269,18 +279,21 @@ namespace ARplanetDefBuilder
                     case (3, "attribute"):
                         if(path.Last() == "star") {
                             (string, string) attInfoB = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.StarAttributes);
+                            if(attInfoB == (null, null)) break;
                             galaxy.SetAttribute(path.FullPath, attInfoB.Item1, attInfoB.Item2);
                         } //Binary star attribute
                         else {
                             (string, string) attInfoP = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.PlanetAttributes);
+                            if(attInfoP == (null, null)) break;
                             galaxy.SetAttribute(path.FullPath, attInfoP.Item1, attInfoP.Item2);
                         } //Planet attribute
                         break;
                     case (3, "property"):
                         if(path.Last() == "star") break;
                         else {
-                            (string, string) attInfoP = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.PlanetAttributes);
-                            galaxy.SetAttribute(path.FullPath, attInfoP.Item1, attInfoP.Item2);
+                            (string, string) propInfoP = MissingProperties(galaxy.GetProperty(path.FullPath));
+                            if(propInfoP == (null, null)) break;
+                            galaxy.SetAttribute(path.FullPath, propInfoP.Item1, propInfoP.Item2);
                         }
                         break; //New planet property
                     case (3, "moon"):
@@ -294,10 +307,12 @@ namespace ARplanetDefBuilder
 
                     case (4, "attribute"):
                         (string, string) attInfoM = MissingAttributes(galaxy.GetProperty(path.FullPath), Modules.References.PlanetAttributes);
+                        if(attInfoM == (null, null)) break;
                         galaxy.SetAttribute(path.FullPath, attInfoM.Item1, attInfoM.Item2);
                         break; //New moon attribute
                     case (4, "property"):
                         (string, string) propInfoM = MissingProperties(galaxy.GetProperty(path.FullPath));
+                        if(propInfoM == (null, null)) break;
                         galaxy.SetProperty(path.FullPath, new XElement(propInfoM.Item1, propInfoM.Item2));
                         break; //New moon property
                 }
@@ -314,31 +329,11 @@ namespace ARplanetDefBuilder
 }
 
 /*
-KKKKKKKKKKKKKKKKKKKKKKKKKKKK0KKKKKKKKKKKKKKKK
-KKKKKKKKKKKKKKKOkxddooooddxkO0KKKKKKKKKKKKKKK
-KKKKKKKKK0K0xooooddxdlcdxdooooox0KKKKK0KKKKKK
-000000000OolldO0K00KOdokK00K0OdlldO0000000000
-0000000Odclk00000kxdlccldxk00000klcdO00000000
-000000klcx0000koloooddddooolok0000xclk0000000
-OOOOOkcckOOOkl;:oxkkkkkkkkxo:,lkOOOkcck0OOOOO
-OOOOOl:xOOOk:  ..,;;::::;;,.. .:kOOOx:lOOOOOO
-OOOOx:cOOOOl.  .,,;cllllc;,,.  .lOOOOc:xOOOOO
-kkkOd;lOkOx;   ',;codxxdoc;,'   ;kOkOl;dOkkkk
-kkkkd;lkkkk:   .,,:loddol:,,.   :xkkkl;dkkkkk
-kkkkx::xkkxl.   .',;;:::;,'..  .okkkx::xkkkkk
-xxxxko;cxxdoc..';:ccccccccc;'..lxxxxl;okxxxxx
-xxxxxxl;lxxdolc:codxxxxxxdlc:coxxxxl;lxxxxxxx
-xxxxxxxl;:oxxxxdlcccc::ccccldxxxxo:;lxxxxxxxx
-dddddddxoc;:ldxddxddl::ccodddxdl:;:oddddddddd
-ddddddddddoc:::cloddo::looolc::;coddddddddddd
-dddddddddddddoc:::::;,,;:::::codddddddddddddd
-oooooooooooodooddooolllloooddoooooooooooooooo
-ooooooooooooooooooooooooooooooooooooooooooooo
-*/
-
-
-/*
 To do
 -------------------
 Disable the removing of some key properties and attributes to avoid breaking the code or the file. e.g. "name" attribute of planets and stars.
+^ is this even necessary?
+
+add import ability
+Template graph for later: https://www.desmos.com/calculator/lgskpjbd53
 */

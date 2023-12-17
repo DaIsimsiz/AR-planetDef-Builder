@@ -1,12 +1,10 @@
 using static Modules.Basics;
-using static Modules.References;
 
 using System.Xml.Linq;
 
 
 namespace Modules
 {
-    //Aw hell nah, I'm never using Chat-GPT to generate names again 💀
     /// <summary>
     /// A class with methods for creating new celestial bodies (planets, stars, moons, etc.)
     /// </summary>
@@ -19,14 +17,12 @@ namespace Modules
         /// <returns></returns>
         public static XElement NewStar(bool binary = false)
         {
-            //string? input;
-
             List<string> starV = new List<string>();
             string[] starRequired = {"name", "temp", "size"};
-            //X and Y coordinates, along with these random planets will be handled separately
+            //X and Y coordinates, along with the random planets will be handled separately
 
             XElement star = new XElement("star");
-            InputAttributeValues(ref starRequired, ref starV, ref StarAttributes, ref star, true);
+            InputAttributeValues(ref starRequired, ref starV, ref References.StarAttributes, ref star, true);
 
             if(!binary) {
                 star.Add(new XAttribute("x", new Random().Next(-500, 500)));
@@ -63,12 +59,12 @@ namespace Modules
             string[] requiredTerrestrial = {"isKnown", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes", "biomeIds"};
             string[] requiredGaseous = {"isKnown", "GasGiant", "gas", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes"};
 
-            InputAttributeValues(ref requiredAttributes, ref AttributesV, ref PlanetAttributes, ref planet);
+            InputAttributeValues(ref requiredAttributes, ref AttributesV, ref References.PlanetAttributes, ref planet);
 
             if(gaseous) {
-                InputPropertyValues(ref requiredGaseous, ref GaseousV, ref GaseousPlanetSpecifications, ref planet);
+                InputPropertyValues(ref requiredGaseous, ref GaseousV, ref References.GaseousPlanetSpecifications, ref planet);
             }else{
-                InputPropertyValues(ref requiredTerrestrial, ref TerrestrialV, ref TerrestrialPlanetSpecifications, ref planet);
+                InputPropertyValues(ref requiredTerrestrial, ref TerrestrialV, ref References.TerrestrialPlanetSpecifications, ref planet);
             }
 
             return planet;

@@ -54,20 +54,21 @@ namespace Modules
                     case "star"  : Console.Write($"> {body.Elements().ElementAt(i).Attribute("name").Value}");break;
                     default      : Console.Write($"> {body.Elements().ElementAt(i).Value}");break;
                 }
-                Console.WriteLine("\n");
+                Console.WriteLine("");
             }
         }
 
         /// <summary>
         /// Prompts the user to modify the attribute of their choice.
         /// </summary>
-        public static (string, string) MissingAttributes(XElement body, Dictionary<string, string> dict)
+        public static (string?, string?) MissingAttributes(XElement body, Dictionary<string, string> dict)
         {
             List<string> missing = body.Attributes().Where(att => body.Attributes().All(bodyAtt => bodyAtt.Name != att.Name)).Select(att => att.Name.ToString()).ToList();
             for(int i = 0;i < 0;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
             string? input;
             string attributeN;
             string value;
+            if(missing.Count == 0) return (null, null);
 
             while(true) {
                 SendMessages(true, "Here is a list of attributes you may add (cAsE sEnSiTiVe):\n");

@@ -13,5 +13,14 @@ namespace Modules
             if(clean) Console.Clear();
             foreach(string message in messages) Console.WriteLine(message);
         }
+
+        /// <summary>
+        /// A better way to get user input. WIP
+        /// </summary>
+        public static string ReadLine()
+        {
+            //Do stuff
+            return "";
+        }
     }
 }
