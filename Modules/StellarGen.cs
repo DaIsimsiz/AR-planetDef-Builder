@@ -37,6 +37,8 @@ namespace Modules
 
             return star;
         }
+
+        static int DIMID = 3;
         /// <summary>
         /// Creates a new planet.
         /// </summary>
@@ -52,14 +54,15 @@ namespace Modules
                 else if(input == "n") {gaseous = false;break;}
             }
 
-            List<string> AttributesV = new List<string>();
-            List<string> TerrestrialV = new List<string>();
-            List<string> GaseousV = new List<string>();
-            string[] requiredAttributes = {"name", "DIMID"};
+            List<string> AttributesV = new();
+            List<string> TerrestrialV = new();
+            List<string> GaseousV = new();
+            string[] requiredAttributes = {"name"};
             string[] requiredTerrestrial = {"isKnown", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes", "biomeIds"};
             string[] requiredGaseous = {"isKnown", "GasGiant", "gas", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes"};
 
             InputAttributeValues(ref requiredAttributes, ref AttributesV, ref References.PlanetAttributes, ref planet);
+            AttributesV.Add(DIMID.ToString());DIMID++;
 
             if(gaseous) {
                 InputPropertyValues(ref requiredGaseous, ref GaseousV, ref References.GaseousPlanetSpecifications, ref planet);
@@ -75,11 +78,8 @@ namespace Modules
         /// </summary>
         static string PickRandomName(bool isStar = false)
         { 
-            //Integrate into code
-            List<string> names;
-            if(isStar) names = File.ReadAllLines("starNames.txt").ToList();
-            else names = File.ReadAllLines("planetNames.txt").ToList();
-            return names[new Random().Next(names.Count)]; //Fix so you dont read the whole file
+            if(isStar) return References.StarNames[new Random().Next(References.StarNames.Length)];
+            else return References.PlanetNames[new Random().Next(References.PlanetNames.Length)];
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace Modules
             foreach(string attributeName in required) {
                 SendMessages(true, $"Enter a value for \"{attributeName}\".\nDescription: {Dictionary[attributeName]}");
                 input = Console.ReadLine();
-                if(attributeName == "name" && input == "") input = PickRandomName(); 
+                if(attributeName == "name" && input == "") input = PickRandomName(false); 
                 valuesL.Add(input);
             }
             InputValidation(ref valuesL, ref required);

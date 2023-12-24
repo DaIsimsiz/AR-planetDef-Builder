@@ -15,10 +15,15 @@ namespace Modules
         /// </summary>
         public class Galaxy
         {
-            XDocument Document = new(new XElement("galaxy", Modules.References.Sol()))
-            {
-                Declaration = new XDeclaration("1.0", "UTF-8", "no")
-            };
+            XDocument Document;
+
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            public Galaxy(string import = null) {
+                try{Document = XDocument.Parse(File.ReadAllText(import));}
+                catch(Exception){ Document = new(new XElement("galaxy", References.Sol())){Declaration = new XDeclaration("1.0", "UTF-8", "no")};}
+            }
 
 
 
@@ -74,8 +79,17 @@ namespace Modules
             /// <summary>
             /// Exports the galaxy into a file.
             /// </summary>
-            public void Export(string path = null) {
-                Document.Save(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\planetDefsEXPORT.xml");
+            public void Export(string? path = null) {
+                Document.Save(path ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\planetDefsEXPORT.xml");
+            }
+
+
+
+            /// <summary>
+            /// Imports a galaxy from a file.
+            /// </summary>
+            public void Import(XDocument import) {
+                Document = import;
             }
         }
 

@@ -14,18 +14,18 @@ namespace ARplanetDefBuilder
 
         public bool neverAsk = false;
 
-        public void DefaultSDir() {this.saveDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);return;}
+        public void DefaultSDir() {saveDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);return;}
     }
     class Program
     {
-        static readonly Modules.PlanetDefs.Galaxy galaxy = new();
-        static readonly Modules.PlanetDefs.Path path = new();
-
-        static readonly string dataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder";
+        static public readonly string dataDir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder";
         static readonly string dataFile = dataDir + @"\preferences.json";
+        static readonly Modules.PlanetDefs.Galaxy galaxy = new(dataDir + @"\import.xml");
+        static readonly Modules.PlanetDefs.Path path = new();
 
         static void Main()
         {
+            if(!Directory.Exists(dataDir)) {Directory.CreateDirectory(dataDir);}
             Console.Title = "planetDefs Builder";
             string? input;
             while(true) {
@@ -329,11 +329,6 @@ namespace ARplanetDefBuilder
 }
 
 /*
-To do
--------------------
-Disable the removing of some key properties and attributes to avoid breaking the code or the file. e.g. "name" attribute of planets and stars.
-^ is this even necessary?
-
-add import ability
+NOTE: My custom universe generator will be a separate project.
 Template graph for later: https://www.desmos.com/calculator/lgskpjbd53
 */
