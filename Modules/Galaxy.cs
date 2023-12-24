@@ -80,7 +80,7 @@ namespace Modules
             /// Exports the galaxy into a file.
             /// </summary>
             public void Export(string? path = null) {
-                Document.Save(path + "\\planetDefsEXPORT.xml" ?? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\planetDefsEXPORT.xml");
+                Document.Save(path == null ? Environment.SpecialFolder.Desktop + "\\planetDefsEXPORT.xml" : path + "\\planetDefsEXPORT.xml");
             }
 
 
