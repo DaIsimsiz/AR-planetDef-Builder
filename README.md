@@ -1,11 +1,16 @@
-
-# Advanced Rocketry `planetDef.xml` builder
+# Advanced Rocketry `planetDefs.xml` builder
 
 A program to easily create a planetDefs file for Advanced Rocketry mod with your own specifications!
 
 This specific version is a console app designed for Minecraft version 1.12.2.
 
 ![Static Badge](https://img.shields.io/badge/License-GPL%203.0-2ea8ff?link=https%3A%2F%2Fchoosealicense.com%2Flicenses%2Fgpl-3.0%2F)
+## How to import a `planetDefs.xml` file
+- Rename the file to `import.xml`
+- Go to `%APPDATA%\planetDefs-Builder` (Folder generated upon first launch)
+- Put the `import.xml` inside
+- Launch the app
+
 ## Dependencies
 If the app does not work, try installing **.NET 7 Runtime** manually.
 
