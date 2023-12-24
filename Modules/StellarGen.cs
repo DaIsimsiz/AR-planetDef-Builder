@@ -74,15 +74,6 @@ namespace Modules
         }
 
         /// <summary>
-        /// Picks a random star name when true, otherwise a planet name.
-        /// </summary>
-        static string PickRandomName(bool isStar = false)
-        { 
-            if(isStar) return References.StarNames[new Random().Next(References.StarNames.Length)];
-            else return References.PlanetNames[new Random().Next(References.PlanetNames.Length)];
-        }
-
-        /// <summary>
         /// Prompts the user to enter a value for the specified list of properties.
         /// </summary>
         static void InputPropertyValues(ref string[] required, ref List<string> valuesL, ref Dictionary<string, string> Dictionary, ref XElement body) {
@@ -90,7 +81,6 @@ namespace Modules
                 SendMessages(true, $"Enter a value for \"{propertyName}\".\nDescription: {Dictionary[propertyName]}");
                 valuesL.Add(Console.ReadLine());
             }
-            InputValidation(ref valuesL, ref required);
             for(int i = 0; i < valuesL.Count; i++) {
                 body.Add(new XElement(required[i], valuesL[i]));
             }
@@ -100,39 +90,16 @@ namespace Modules
         /// Prompts the user to enter a value for the specified list of attributes.
         /// </summary>
         static void InputAttributeValues(ref string[] required, ref List<string> valuesL, ref Dictionary<string, string> Dictionary, ref XElement body, bool isStar = false) {
-            string input = String.Empty;
+            string? input;
             foreach(string attributeName in required) {
                 SendMessages(true, $"Enter a value for \"{attributeName}\".\nDescription: {Dictionary[attributeName]}");
                 input = Console.ReadLine();
-                if(attributeName == "name" && input == "") input = PickRandomName(false); 
                 valuesL.Add(input);
             }
-            InputValidation(ref valuesL, ref required);
             for(int i = 0; i < valuesL.Count; i++) {
                 body.Add(new XAttribute(required[i], valuesL[i]));
             }
         }
-        //ref ref ref ref ref everywhere
-
-        /// <summary>
-        /// Checks if the given input for a property/attribute is valid. Otherwise returns a valid placeholder input.
-        /// </summary>
-        static void InputValidation(ref List<string> values, ref string[] names) {
-            foreach(string value in values) {
-                switch(value) {
-                    case "a":
-                        //
-                        break;
-                    case "b":
-                        //
-                        break;
-                    default:
-                        //
-                        break;
-                } //oooh my god
-            }
-        }
-
 
         static public bool IsValid(string e, string? value) {
             string type;
