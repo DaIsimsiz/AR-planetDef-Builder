@@ -1,10 +1,10 @@
-﻿using static Modules.Interface;
+using static Modules.Interface;
 using static Modules.Basics;
 
 using System.Xml.Linq;
 using System.Text.Json;
 using System.Text;
-
+using System.Diagnostics;
 
 namespace ARplanetDefBuilder
 {
@@ -197,7 +197,7 @@ namespace ARplanetDefBuilder
                 }
                 if(cancel) {}
                 else{
-                    FileStream fs = new(dataFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+                    FileStream fs = new(dataFile, FileMode.Create, FileAccess.ReadWrite);
                     StreamReader sr = new(fs);
                     AppData data = ValidData(sr.ReadToEnd());
                     if(!data.neverAsk) {
@@ -228,7 +228,7 @@ namespace ARplanetDefBuilder
                         data.DefaultSDir();
                     }
                     sr.Close();
-                    StreamWriter sw = new(fs);
+                    StreamWriter sw = new(fs.Name);
                     sw.Write(JsonSerializer.Serialize(data));
                     sw.Close();
                     fs.Close();
