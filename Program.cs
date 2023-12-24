@@ -4,7 +4,6 @@ using static Modules.Basics;
 using System.Xml.Linq;
 using System.Text.Json;
 using System.Text;
-using System.Diagnostics;
 
 namespace ARplanetDefBuilder
 {
