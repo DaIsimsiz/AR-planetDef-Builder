@@ -2,8 +2,7 @@
 using static Modules.Basics;
 
 using System.Xml.Linq;
-using System.Text.Json;
-using System.Text;
+using Newtonsoft.Json;
 
 
 namespace ARplanetDefBuilder
@@ -197,9 +196,9 @@ namespace ARplanetDefBuilder
                 }
                 if(cancel) {}
                 else{
-                    FileStream fs = new(dataFile, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-                    StreamReader sr = new(fs);
+                    StreamReader sr = new(new FileStream(dataFile, FileMode.OpenOrCreate, FileAccess.Read));
                     AppData data = ValidData(sr.ReadToEnd());
+                    sr.Close();
                     if(!data.neverAsk) {
                         while(true) {
                             
@@ -227,11 +226,9 @@ namespace ARplanetDefBuilder
                         Console.WriteLine("Directory doesn't exist! Defaulting to desktop...");
                         data.DefaultSDir();
                     }
-                    sr.Close();
-                    StreamWriter sw = new(fs);
-                    sw.Write(JsonSerializer.Serialize(data));
+                    StreamWriter sw = new(new FileStream(dataFile, FileMode.Create, FileAccess.Write));
+                    sw.Write(JsonConvert.SerializeObject(data));
                     sw.Close();
-                    fs.Close();
                     galaxy.Export(data.saveDirectory);
                     Environment.Exit(0);
                 }
@@ -320,10 +317,10 @@ namespace ARplanetDefBuilder
         }
         static AppData ValidData(string data) {
             try
-            {
-                return JsonSerializer.Deserialize<AppData>(data);
+            { 
+                return JsonConvert.DeserializeObject<AppData>(data);
             }
-            catch(Exception) {return new AppData();}
+            catch(Exception ex) {Console.WriteLine(ex);Console.ReadLine();return new AppData();}
         }
     }
 }
