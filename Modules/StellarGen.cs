@@ -58,14 +58,15 @@ namespace Modules
             List<string> TerrestrialV = new();
             List<string> GaseousV = new();
             string[] requiredAttributes = {"name"};
-            string[] requiredTerrestrial = {"isKnown", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes", "biomeIds"};
-            string[] requiredGaseous = {"isKnown", "GasGiant", "gas", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "generateCraters", "generateCaves", "generateVolcanos", "generateStructures", "generateGeodes"};
+            string[] requiredTerrestrial = {"isKnown", "fogColor", "skyColor", "gravitationalMultiplier", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde", "avgTemperature", "rotationalPeriod", "atmosphereDensity", "biomeIds"};
+            string[] requiredGaseous = {"isKnown", "gas", "orbitalDistance", "orbitalTheta", "orbitalPhi", "retrograde"};
 
             InputAttributeValues(ref requiredAttributes, ref AttributesV, ref References.PlanetAttributes, ref planet);
             AttributesV.Add(DIMID.ToString());DIMID++;
 
             if(gaseous) {
                 InputPropertyValues(ref requiredGaseous, ref GaseousV, ref References.GaseousPlanetSpecifications, ref planet);
+                planet.Add(new XAttribute("GasGiant", "true"));
             }else{
                 InputPropertyValues(ref requiredTerrestrial, ref TerrestrialV, ref References.TerrestrialPlanetSpecifications, ref planet);
             }

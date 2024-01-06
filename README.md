@@ -11,6 +11,9 @@ This specific version is a console app designed for Minecraft version 1.12.2.
 - Put the `import.xml` inside
 - Launch the app
 
+## Notice
+Any bugs caused by fiddling around with the AppData files will not be fixed. Report them only if they were caused by the program without your interference.
+
 ## Dependencies
 If the app does not work, try installing **.NET 7 Runtime** manually.
 

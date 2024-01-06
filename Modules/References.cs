@@ -99,7 +99,7 @@ namespace Modules
                 { "oceanBlock", "Specifies which block will be placed instead in oceans. (e.g. minecraft:lava, minecraft:air, minecraft:water)" },
                 { "seaLevel", "Y level water bodies start appearing at." },
                 { "spawnable", "Specifies what can spawn on the planet. (e.g. minecraft:villager, minecraft:ghast)" },
-                { "biomeIds", "A list of biomes that can be found on a planet, you can specify with mod:biomeName or with biome ID. Biomes are separated by semicolons. (e.g. minecraft:jungle;30)" },
+                { "biomeIds", "A list of biomes that can be found on a planet, the format is \"mod:biomeName;weight\". Weight determines how common the biome is. (e.g. minecraft:jungle;30,minecraft:plains;10)" },
                 { "artifact", "Items needed to travel to the planet with the Warp Controller. (e.g. minecraft:coal 1, minecraft:obsidian) " },
                 { "generateCraters", "If true, the planet will have craters on it." },
                 { "generateCaves", "If true, planet will have caves in it." },
@@ -114,13 +114,13 @@ namespace Modules
                 { "laserDrillOres", "Unknown." },
                 { "geodeOres", "oreDict" },
                 { "craterOres", "oreDict." },
-                { "craterBiomeWeights", "Undocumented." },
-                { "craterFrequencyMultiplier", "Lower = Higher" },
-                { "volcanoFrequencyMultiplier", "Lower = Higher" },
-                { "geodefrequencyMultiplier", "Lower = Higher" },
-                { "hasShading", "Undocumented." },
-                { "hasColorOverride", "Undocumented." },
-                { "skyRenderOverride", "Undocumented." }
+                { "craterBiomeWeights", "unknown" },
+                { "craterFrequencyMultiplier", "Lower value = Higher frequency" },
+                { "volcanoFrequencyMultiplier", "Lower value = Higher frequency" },
+                { "geodefrequencyMultiplier", "Lower value = Higher frequency" },
+                { "hasShading", "unknown" },
+                { "hasColorOverride", "unknown" },
+                { "skyRenderOverride", "unknown" }
             };
         /// <summary>
         /// A list of properties a gaseous planet may have.
@@ -132,7 +132,10 @@ namespace Modules
                 { "gas", "Specifies which gas(es) are in the Gas Giant's atmosphere." },
                 { "orbitalDistance", "Planet's distance from the star." },
                 { "orbitalTheta", "Starting position of the planet in its orbit in degrees." },
+                { "orbitalPhi", "Clockwise displacement of star's rising and setting direction. (e.g. 90 makes stars rise from north.)" },
                 { "retrograde", "If true, orbit direction swaps to counter-clockwise." },
+                { "hasRings", "If true, the planet will have rings." },
+                { "ringColor", "3 floating point numbers (1.0 - 0) or a hex code (0xFFFFFF) to choose the color of the rings. (e.g 1.0,1.0,1.0)" }
             };
         /// <summary>
         /// A list of attributes a binary star may have.

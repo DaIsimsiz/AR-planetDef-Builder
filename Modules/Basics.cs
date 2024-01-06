@@ -13,5 +13,14 @@ namespace Modules
             if(clean) Console.Clear();
             foreach(string message in messages) Console.WriteLine(message);
         }
+
+        /// <summary>
+        /// For debugging purposes only. There should be 0 references of this method once the publish is made.
+        /// </summary>
+        public static void DEBUG(object message)
+        {
+            Console.WriteLine(message);
+            Console.ReadLine();
+        }
     }
 }

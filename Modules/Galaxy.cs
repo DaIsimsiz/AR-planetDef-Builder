@@ -27,6 +27,14 @@ namespace Modules
 
 
 
+            public void LoadSave() {
+                try{
+                    Document = XDocument.Parse(File.ReadAllText(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder\AUTOSAVE.xml"));
+                }catch(Exception){}
+            }
+
+
+
             /// <summary>
             /// Returns the attribute at the specified path.
             /// </summary>
@@ -53,7 +61,8 @@ namespace Modules
             public void SetAttribute(string path, string attributeName, string value)
             {
                 if(value == null) Document.XPathSelectElement(path).Attribute(attributeName).Remove();
-                else Document.XPathSelectElement(path).Attribute(attributeName).Value = value;
+                else if(Document.XPathSelectElement(path).Attributes().Any(att => att.Name.ToString() == attributeName)) Document.XPathSelectElement(path).Attribute(attributeName).Value = value;
+                else Document.XPathSelectElement(path).Add(new XAttribute(attributeName, value));
             }
 
 
@@ -63,8 +72,8 @@ namespace Modules
             /// </summary>
             public void SetProperty(string path, string value)
             {
-                if(value != null) Document.XPathSelectElement(path).Value = value;
-                Document.XPathSelectElement(path).Remove();
+                if(value == null) Document.XPathSelectElement(path).Remove();
+                else Document.XPathSelectElement(path).Value = value;
             }
             /// <summary>
             /// Changes/Adds the property at the specified path.
@@ -81,6 +90,18 @@ namespace Modules
             /// </summary>
             public void Export(string? path = null) {
                 Document.Save(path == null ? Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + @"\planetDefs.xml" : path + @"\planetDefs.xml");
+                if(File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder\AUTOSAVE.xml")) {
+                    try{File.Delete(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder\AUTOSAVE.xml");}catch(Exception){}
+                }
+            }
+            /// <summary>
+            /// Autosave.
+            /// </summary>
+            public void Export() {
+                while(true) {
+                    try{Document.Save(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder\AUTOSAVE.xml");break;}
+                    catch(Exception){}
+                }
             }
 
 

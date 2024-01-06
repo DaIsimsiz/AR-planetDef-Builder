@@ -63,8 +63,12 @@ namespace Modules
         /// </summary>
         public static (string?, string?) MissingAttributes(XElement body, Dictionary<string, string> dict)
         {
-            List<string> missing = body.Attributes().Where(att => body.Attributes().All(bodyAtt => bodyAtt.Name != att.Name)).Select(att => att.Name.ToString()).ToList();
-            for(int i = 0;i < 0;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
+            List<string> missing = new();
+            foreach(string a in dict.Keys) {
+                if(body.Attributes().Any(att => att.Name.ToString() == a)) continue;
+                else missing.Add(a);
+            }
+            for(int i = 0;i < missing.Count;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
             string? input;
             string attributeN;
             string value;
@@ -75,7 +79,10 @@ namespace Modules
                 foreach(string a in missing) Console.WriteLine(a);
                 Console.WriteLine();
                 input = Console.ReadLine();
-                if(!missing.Contains(input)) continue;
+                if(!missing.Contains(input)) {
+                    if(input == "" || input == string.Empty || input == null) return (null, null);
+                    else continue;
+                }
                 else{attributeN = input;break;}
             }
             while(true) {
@@ -96,18 +103,26 @@ namespace Modules
                 if(!dict.ContainsKey(KVPair.Key)) dict.Add(KVPair.Key, KVPair.Value);
             }
 
-            List<string> missing = body.Elements().Where(prop => body.Elements().All(bodyProp => bodyProp.Name != prop.Name)).Select(prop => prop.Name.ToString()).ToList();
-            for(int i = 0;i < 0;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
+            List<string> missing = new();
+            foreach(string a in dict.Keys) {
+                if(body.Elements().Any(prop => prop.Name.ToString() == a)) continue;
+                else missing.Add(a);
+            }
+            for(int i = 0;i < missing.Count;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
             string? input;
             string propertyName;
             string value;
+            if(missing.Count == 0) return (null, null);
 
             while(true) {
                 SendMessages(true, "Here is a list of properties you may add (cAsE sEnSiTiVe):\n");
                 foreach(string a in missing) Console.WriteLine(a);
                 Console.WriteLine();
                 input = Console.ReadLine();
-                if(!missing.Contains(input)) continue;
+                if(!missing.Contains(input)) {
+                    if(input == "" || input == string.Empty || input == null) return (null, null);
+                    else continue;
+                }
                 else{propertyName = input;break;}
             }
             while(true) {

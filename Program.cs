@@ -27,7 +27,14 @@ namespace ARplanetDefBuilder
             if(!Directory.Exists(dataDir)) {Directory.CreateDirectory(dataDir);}
             Console.Title = "planetDefs Builder";
             string? input;
+            while(File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\planetDefs-Builder\AUTOSAVE.xml")) {
+                SendMessages(true, "An autosave was found. Would you like to load it?", "y/n");
+                input = Console.ReadLine();
+                if(input == "y") {galaxy.LoadSave();break;}
+                else if(input == "n") {break;}
+            }
             while(true) {
+                galaxy.Export();
                 LoadObject(galaxy.GetProperty(path.FullPath));
                 Console.WriteLine();
                 InputPrompt();
@@ -290,7 +297,7 @@ namespace ARplanetDefBuilder
                         else {
                             (string, string) propInfoP = MissingProperties(galaxy.GetProperty(path.FullPath));
                             if(propInfoP == (null, null)) break;
-                            galaxy.SetAttribute(path.FullPath, propInfoP.Item1, propInfoP.Item2);
+                            galaxy.SetProperty(path.FullPath, new XElement(propInfoP.Item1, propInfoP.Item2));
                         }
                         break; //New planet property
                     case (3, "moon"):
