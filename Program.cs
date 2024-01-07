@@ -323,11 +323,13 @@ namespace ARplanetDefBuilder
             }
         }
         static AppData ValidData(string data) {
-            try
-            { 
-                return JsonConvert.DeserializeObject<AppData>(data);
-            }
-            catch(Exception ex) {Console.WriteLine(ex);Console.ReadLine();return new AppData();}
+            try {
+                AppData temp = JsonConvert.DeserializeObject<AppData>(data);
+                AppData valid = new();
+                valid.saveDirectory = temp.saveDirectory ?? valid.saveDirectory;
+                valid.neverAsk = temp.neverAsk == null ? valid.neverAsk : temp.neverAsk;
+                return valid;
+            }catch(Exception){return new AppData();}
         }
     }
 }

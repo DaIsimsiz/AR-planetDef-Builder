@@ -19,7 +19,7 @@ namespace Modules
         /// </summary>
         public static void DEBUG(object message)
         {
-            Console.WriteLine(message);
+            try{Console.WriteLine(message);}catch(Exception ex){Console.WriteLine(ex);}
             Console.ReadLine();
         }
     }
