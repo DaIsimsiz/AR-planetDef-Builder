@@ -105,7 +105,7 @@ namespace Modules
 
             List<string> missing = new();
             foreach(string a in dict.Keys) {
-                if(body.Elements().Any(prop => prop.Name.ToString() == a)) continue;
+                if(body.Elements().Any(prop => prop.Name.ToString() == a && prop.Name.ToString() != "gas")) continue;
                 else missing.Add(a);
             }
             for(int i = 0;i < missing.Count;i++) if(dict[missing[i]] == "unknown") missing.RemoveAt(i);
